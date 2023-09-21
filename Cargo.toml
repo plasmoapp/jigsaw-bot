@@ -1,0 +1,3 @@
+[workspace]
+members = ["jigsaw-backend", "jigsaw-teloxide", "jigsaw-common", "jigsaw-pubsub"]
+resolver = "2"
