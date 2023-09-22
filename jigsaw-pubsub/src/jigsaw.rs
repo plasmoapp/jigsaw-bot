@@ -1,18 +1,11 @@
-use std::{collections::HashMap};
+use std::collections::HashMap;
 
 use eyre::Report;
-use futures::{StreamExt};
-use image::{
-    imageops::FilterType::{self},
-    DynamicImage, GenericImageView,
+use image::{imageops::FilterType, DynamicImage, GenericImageView};
+use jigsaw_common::{
+    model::puzzle::{JigsawIndex, JigsawPuzzle, JigsawTile},
+    util::indexed::Indexed,
 };
-use jigsaw_common::util::indexed::Indexed;
-
-
-
-
-
-
 
 use rayon::prelude::*;
 use uuid::Uuid;
@@ -22,45 +15,6 @@ const BIGGER_SIDE_SIZE_PX: u32 = 1920;
 const TILES_PER_BIGGER_SIDE: u32 = 8;
 
 const TILE_SIZE_PX: u32 = BIGGER_SIDE_SIZE_PX / TILES_PER_BIGGER_SIDE;
-
-#[derive(Debug)]
-pub struct JigsawPuzzle {
-    uuid: Uuid,
-    tile_map: HashMap<Uuid, JigsawTile>,
-}
-
-impl JigsawPuzzle {
-    pub fn new(uuid: Uuid, tile_map: HashMap<Uuid, JigsawTile>) -> Self {
-        Self { uuid, tile_map }
-    }
-}
-
-#[derive(Debug)]
-pub struct JigsawTile {
-    pub index: JigsawIndex,
-    pub in_place: bool,
-}
-
-#[derive(PartialEq, Eq, Debug)]
-pub struct JigsawIndex {
-    pub x: u32,
-    pub y: u32,
-}
-
-impl From<JigsawIndex> for JigsawTile {
-    fn from(value: JigsawIndex) -> Self {
-        JigsawTile {
-            index: value,
-            in_place: false,
-        }
-    }
-}
-
-impl JigsawIndex {
-    pub fn new(x: u32, y: u32) -> Self {
-        Self { x, y }
-    }
-}
 
 pub struct RawJigsawPuzzle {
     pub puzzle_source: DynamicImage,

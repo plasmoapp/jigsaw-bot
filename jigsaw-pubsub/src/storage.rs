@@ -1,22 +1,23 @@
-use std::{path::PathBuf};
+use std::path::PathBuf;
 
 use async_trait::async_trait;
 use eyre::Report;
 use futures::{stream, StreamExt, TryStreamExt};
 use image::ImageFormat;
+use jigsaw_common::model::puzzle::JigsawPuzzle;
 use path_macro::path;
 
-use crate::jigsaw::{IndexedRawJigsawPuzzle, JigsawPuzzle, RawJigsawPuzzle};
+use crate::jigsaw::{IndexedRawJigsawPuzzle, RawJigsawPuzzle};
 
 pub struct JigsawStorage {
-    image_storage: Box<dyn JigsawImageStorage>,
-    state_storage: Box<dyn JigsawStateStorage>,
+    image_storage: Box<dyn JigsawImageStorage + Sync + Send>,
+    state_storage: Box<dyn JigsawStateStorage + Sync + Send>,
 }
 
 impl JigsawStorage {
     pub fn new(
-        image_storage: impl JigsawImageStorage + 'static,
-        state_storage: impl JigsawStateStorage + 'static,
+        image_storage: impl JigsawImageStorage + Sync + Send + 'static,
+        state_storage: impl JigsawStateStorage + Sync + Send + 'static,
     ) -> Self {
         Self {
             image_storage: Box::new(image_storage),
