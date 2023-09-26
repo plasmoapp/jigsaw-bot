@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use eyre::Report;
 use image::{imageops::FilterType, DynamicImage, GenericImageView};
 use jigsaw_common::{
@@ -10,7 +8,7 @@ use jigsaw_common::{
 use rayon::prelude::*;
 use uuid::Uuid;
 
-const BIGGER_SIDE_SIZE_PX: u32 = 1920;
+const BIGGER_SIDE_SIZE_PX: u32 = 640;
 
 const TILES_PER_BIGGER_SIDE: u32 = 8;
 

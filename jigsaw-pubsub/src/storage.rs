@@ -4,8 +4,9 @@ use async_trait::async_trait;
 use eyre::Report;
 use futures::{stream, StreamExt, TryStreamExt};
 use image::ImageFormat;
-use jigsaw_common::model::puzzle::JigsawPuzzle;
+use jigsaw_common::model::{event::puzzle_generated, puzzle::JigsawPuzzle};
 use path_macro::path;
+use redis::{aio::MultiplexedConnection, AsyncCommands};
 
 use crate::jigsaw::{IndexedRawJigsawPuzzle, RawJigsawPuzzle};
 
@@ -81,14 +82,34 @@ impl JigsawImageStorage for JigsawFsImageStorage {
     }
 }
 
-pub struct JigsawRedisStateStorage {}
+pub struct JigsawRedisStateStorage {
+    redis_connection: MultiplexedConnection,
+}
+
+impl JigsawRedisStateStorage {
+    pub fn new(redis_connection: MultiplexedConnection) -> Self {
+        Self { redis_connection }
+    }
+}
 
 #[async_trait]
 impl JigsawStateStorage for JigsawRedisStateStorage {
     async fn store(&self, puzzle: IndexedRawJigsawPuzzle) -> Result<JigsawPuzzle, Report> {
         let puzzle: JigsawPuzzle = puzzle.into();
 
-        // TODO
+        let mut redis_connection = self.redis_connection.clone();
+
+        let key = format!("jigsaw_puzzle_state:{}", puzzle.uuid);
+
+        let map = puzzle
+            .tile_map
+            .iter()
+            .map(|(key, value)| Ok((key.to_string(), rmp_serde::to_vec(&value)?)))
+            .collect::<Result<Vec<(_, _)>, Report>>()?;
+
+        debug!("Storing puzzle with the key: {key}");
+
+        redis_connection.hset_multiple(key, &map).await?;
 
         Ok(puzzle)
     }

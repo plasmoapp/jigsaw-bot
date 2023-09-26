@@ -1,19 +1,18 @@
-use std::sync::{Arc, Mutex};
+
 
 use eyre::Report;
 use jigsaw_common::model::{
-    event::puzzle_generated::PuzzleGeneratedEvent,
-    puzzle::{JigsawPuzzle, JigsawTile},
+    puzzle::{JigsawPuzzle},
     request::generate_puzzle::GeneratePuzzleRequest,
 };
 use path_macro::path;
-use redis::{aio::MultiplexedConnection, AsyncCommands, Msg};
-use shrinkwraprs::Shrinkwrap;
+
+
 
 use crate::{
     config::Config,
     jigsaw::RawJigsawPuzzle,
-    storage::{JigsawFsImageStorage, JigsawImageStorage, JigsawRedisStateStorage, JigsawStorage},
+    storage::{JigsawImageStorage, JigsawStorage},
 };
 
 pub struct JigsawGenerator {

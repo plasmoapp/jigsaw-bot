@@ -26,13 +26,16 @@ pub struct JigsawTile {
 #[serde(transparent)]
 pub struct PublicJigsawTile(Option<JigsawIndex>);
 
+// #[derive(Debug, Serialize)]
+// pub struct PublicJigsawPuzzle
+
 impl From<JigsawTile> for PublicJigsawTile {
     fn from(value: JigsawTile) -> Self {
         Self(value.in_place.then_some(value.index))
     }
 }
 
-#[derive(PartialEq, Eq, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Debug, Serialize, Deserialize, Clone)]
 pub struct JigsawIndex {
     pub x: u32,
     pub y: u32,
