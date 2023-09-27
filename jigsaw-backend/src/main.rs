@@ -1,7 +1,12 @@
+#[macro_use]
+extern crate log;
+
+pub mod auth;
 pub mod config;
 pub mod error;
 pub mod model;
 pub mod router;
+pub mod websocket;
 pub mod ws_state;
 
 use error::ReportResposnse;
@@ -14,12 +19,11 @@ use axum::{
     Extension, Json, Router,
 };
 use jigsaw_common::util::config::default_extract_config;
-use log::info;
 use serde::{Deserialize, Serialize};
 use std::{net::SocketAddr, sync::Arc};
 use tower_http::services::{ServeDir, ServeFile};
 
-use crate::{config::Config, router::router, ws_state::WsState};
+use crate::{config::Config, router::router, websocket::state::WebSocketState};
 
 #[tokio::main]
 async fn main() -> Result<(), Report> {
@@ -34,7 +38,7 @@ async fn main() -> Result<(), Report> {
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
 
-    let ws_state = Arc::new(WsState::default());
+    let ws_state = Arc::new(WebSocketState::default());
 
     let router = router(&config)
         .layer(Extension(redis_connection))

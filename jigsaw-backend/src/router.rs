@@ -7,7 +7,7 @@ use tower_http::services::{ServeDir, ServeFile};
 
 use crate::{config::Config, error::ReportResposnse};
 
-use self::api::puzzle::post_place;
+// use self::api::puzzle::post_place;
 use self::ws::get_ws;
 
 pub mod api;
@@ -22,10 +22,10 @@ pub fn router(config: &Config) -> Router {
     Router::new()
         // .route("/", get(root))
         // .route("/api/puzzle/:puzzle_uuid", get(get_puzzle_state))
-        .route(
-            "/api/puzzle/:puzzle_uuid/tile/:tile_uuid/place",
-            post(post_place),
-        )
+        // .route(
+        //     "/api/puzzle/:puzzle_uuid/tile/:tile_uuid/place",
+        //     post(post_place),
+        // )
         .route("/api/puzzle/:puzzle_uuid/websocket", get(get_ws))
         // .roter("/asset/:puzzle_uuid/:image", get(puzzle_asset_handle))
         .nest_service("/assets", serve_dir)

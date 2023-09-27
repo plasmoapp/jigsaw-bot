@@ -7,11 +7,11 @@ use tokio::sync::{
 };
 use uuid::Uuid;
 
-pub struct WsState {
+pub struct WebSocketState {
     puzzle_uuid_to_sender: RwLock<HashMap<Uuid, Sender<Arc<WsMessage>>>>,
 }
 
-impl WsState {
+impl WebSocketState {
     pub async fn get_channel(
         &self,
         puzzle_uuid: &Uuid,
@@ -46,7 +46,7 @@ impl WsState {
     }
 }
 
-impl Default for WsState {
+impl Default for WebSocketState {
     fn default() -> Self {
         Self {
             puzzle_uuid_to_sender: RwLock::new(HashMap::new()),
