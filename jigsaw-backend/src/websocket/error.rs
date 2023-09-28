@@ -16,6 +16,14 @@ pub enum SocketAuthError {
     UnsupportedProtocol(Box<str>),
     #[error("Invalid Credentials")]
     InvalidCredentials,
+    #[error("Invalid request. Expected: {0}")]
+    InvalidRequest(Box<str>),
     #[error("Invalid Header Data: {0}")]
     ToStr(#[from] ToStrError),
+    #[error("Socket Closed")]
+    SocketClosed,
+    #[error("Axum Error: {0}")]
+    Axum(#[from] axum::Error),
+    #[error("Json Error: {0}")]
+    Json(#[from] serde_json::Error),
 }

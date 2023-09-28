@@ -1,13 +1,11 @@
 #[macro_use]
 extern crate log;
 
-pub mod auth;
 pub mod config;
 pub mod error;
 pub mod model;
 pub mod router;
 pub mod websocket;
-pub mod ws_state;
 
 use error::ReportResposnse;
 use eyre::{bail, Report};
@@ -23,30 +21,34 @@ use serde::{Deserialize, Serialize};
 use std::{net::SocketAddr, sync::Arc};
 use tower_http::services::{ServeDir, ServeFile};
 
-use crate::{config::Config, router::router, websocket::state::WebSocketState};
+use crate::{
+    config::Config,
+    router::{router, ws::get_ws},
+    websocket::state::{AppState, WebSocketState},
+};
 
 #[tokio::main]
 async fn main() -> Result<(), Report> {
     dotenvy::dotenv()?;
-    env_logger::init();
-
-    let config = default_extract_config::<Config>()?;
-
-    let redis_connection = redis::Client::open(config.redis_url.as_str())?
-        .get_multiplexed_tokio_connection()
-        .await?;
+    tracing_subscriber::fmt::init();
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
 
-    let ws_state = Arc::new(WebSocketState::default());
+    let state = AppState::new().await?;
 
-    let router = router(&config)
-        .layer(Extension(redis_connection))
-        .layer(Extension(ws_state));
+    let serve_dir_assets = ServeDir::new(&state.config.complete_storage_path);
+    let serve_dir_public = ServeDir::new("public").append_index_html_on_directories(true);
 
-    // .layer(Extension(Arc::new(config)));
+    let router = Router::new()
+        .route(
+            "/api/puzzle/:puzzle_uuid/websocket",
+            axum::routing::get(get_ws),
+        )
+        .nest_service("/assets", serve_dir_assets)
+        .fallback_service(serve_dir_public)
+        .with_state(state);
 
-    info!("Listening on {addr}");
+    tracing::debug!("Listening on {addr}");
 
     axum::Server::bind(&addr)
         .serve(router.into_make_service())

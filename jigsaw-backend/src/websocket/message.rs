@@ -20,18 +20,19 @@ pub enum WsMessage {
 }
 
 #[derive(Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "snake_case")]
 #[serde(tag = "type")]
 pub enum WsRequest {
+    TelegramAuth { data_check_string: String },
     Place { tile_uuid: Uuid, index: JigsawIndex },
 }
 
-impl TryFrom<&WsMessage> for Message {
+impl TryFrom<Message> for WsRequest {
     type Error = serde_json::Error;
 
-    fn try_from(value: &WsMessage) -> Result<Self, Self::Error> {
-        let ser = serde_json::to_string(value)?;
-        Ok(Self::Text(ser))
+    fn try_from(value: Message) -> Result<Self, Self::Error> {
+        let de = serde_json::from_slice(&value.into_data())?;
+        Ok(de)
     }
 }
 
@@ -39,6 +40,7 @@ impl TryFrom<WsMessage> for Message {
     type Error = serde_json::Error;
 
     fn try_from(value: WsMessage) -> Result<Self, Self::Error> {
-        (&value).try_into()
+        let ser = serde_json::to_string(&value)?;
+        Ok(Self::Text(ser))
     }
 }

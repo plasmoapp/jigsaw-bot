@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use eyre::Report;
 use futures::{stream, StreamExt, TryStreamExt};
 use image::ImageFormat;
-use jigsaw_common::model::{event::puzzle_generated, puzzle::JigsawPuzzle};
+use jigsaw_common::model::{puzzle::JigsawPuzzle};
 use path_macro::path;
 use redis::{aio::MultiplexedConnection, AsyncCommands};
 

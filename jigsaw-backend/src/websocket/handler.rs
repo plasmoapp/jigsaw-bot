@@ -2,6 +2,7 @@ use std::{collections::HashMap, str::FromStr, sync::Arc};
 
 use axum::extract::ws::{Message, WebSocket};
 use futures::{stream::SplitSink, SinkExt, StreamExt};
+use itertools::Itertools;
 use jigsaw_common::{
     model::puzzle::{JigsawTile, PublicJigsawTile},
     redis_scheme::RedisScheme,
@@ -10,16 +11,26 @@ use redis::{aio::MultiplexedConnection, AsyncCommands};
 use tokio::sync::broadcast::Receiver;
 use uuid::Uuid;
 
-use crate::model::ws_message::WsMessage;
+use crate::{config::Config, model::user::User};
 
 use eyre::Report;
 
-use super::{error::SocketAuthError, state::WebSocketState};
+use super::{
+    error::SocketAuthError,
+    message::{WsMessage, WsRequest},
+    state::WebSocketState,
+};
+
+use hmac::{Hmac, Mac};
+use sha2::Sha256;
+
+type HmacSha256 = Hmac<Sha256>;
 
 pub struct SocketHandler {
     socket: WebSocket,
     puzzle_uuid: Uuid,
     state: Arc<WebSocketState>,
+    config: Arc<Config>,
     redis: MultiplexedConnection,
 }
 
@@ -39,34 +50,114 @@ impl SocketHandler {
         socket: WebSocket,
         puzzle_uuid: Uuid,
         state: Arc<WebSocketState>,
+        config: Arc<Config>,
         redis: MultiplexedConnection,
     ) -> Self {
         Self {
             socket,
             puzzle_uuid,
+            config,
             state,
             redis,
         }
     }
 
-    async fn authorize(&mut self) -> Result<(), SocketAuthError> {
-        let protocol = self
-            .socket
+    async fn authorize(socket: &mut WebSocket, config: &Config) -> Result<User, SocketAuthError> {
+        let protocol = socket
             .protocol()
             .ok_or(SocketAuthError::NoProtocol)?
             .to_str()?;
 
         let user = match protocol {
-            Self::TELEGRAM_AUTH_PROTOCOL => "Pepega2",
+            Self::TELEGRAM_AUTH_PROTOCOL => Self::authorize_telegram(socket, config).await?,
             #[cfg(debug_assertions)]
-            Self::NOT_SECURE_PROTOCOL => "Pepega",
+            Self::NOT_SECURE_PROTOCOL => User::test(),
             protocol => Err(SocketAuthError::UnsupportedProtocol(protocol.into()))?,
         };
 
-        todo!()
+        Ok(user)
     }
 
-    async fn authorize_telegram(&mut self) -> Result<(), SocketAuthError> {
+    async fn authorize_telegram(
+        socket: &mut WebSocket,
+        config: &Config,
+    ) -> Result<User, SocketAuthError> {
+        // let Some(message) = socket.recv().await else {
+        //     return Err(SocketAuthError::SocketClosed);
+        // };
+
+        let message: WsRequest = socket
+            .recv()
+            .await
+            .ok_or(SocketAuthError::SocketClosed)??
+            .try_into()?;
+
+        let init_data = match message {
+            WsRequest::TelegramAuth { data_check_string } => data_check_string,
+            _ => return Err(SocketAuthError::InvalidRequest("TelegramAuth".into())),
+        };
+
+        let init_data = urlencoding::decode(&init_data).unwrap();
+
+        dbg!(&init_data);
+
+        let mut query = init_data
+            .split('&')
+            .flat_map(|str| str.split_once('='))
+            .collect::<HashMap<_, _>>();
+
+        let hash = query
+            .remove("hash")
+            .ok_or(SocketAuthError::InvalidCredentials)?;
+
+        let data_check_string = query
+            .iter()
+            .sorted_by(|(a, _), (b, _)| Ord::cmp(a, b))
+            .map(|(k, v)| format!("{k}={v}"))
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        // let data_check_string = init_data
+        //     .split('&')
+        //     .filter(|str| !str.starts_with("hash"))
+        //     .sorted_by(|a, b| Ord::cmp(a, b))
+        //     .intersperse("\n")
+        //     .collect::<String>();
+
+        dbg!(&config.bot_token);
+
+        dbg!(&data_check_string);
+
+        let tag = ring::hmac::sign(&key, data_check_string.as_bytes());
+
+        dbg!(hex::encode(tag.as_ref()));
+        dbg!(hash);
+
+        // secret_key.as_ref()
+
+        // let map = data_check_string
+        //     .split('\n')
+        //     .flat_map(|str| str.split_once('='))
+        //     .collect::<HashMap<_, _>>();
+
+        // dbg!(&map);
+
+        // let mut mac = HmacSha256::new_varkey(config.bot_token.as_bytes())
+        //     .expect("HMAC can take key of any size");
+        // mac.update(b"WebAppData");
+
+        // let secret_key = mac.finalize().into_bytes();
+
+        // let mut mac = HmacSha256::new_from_slice(data_check_string.as_bytes())
+        //     .expect("HMAC can take key of any size");
+        // mac.update(&secret_key);
+
+        // let verify_hash = mac.finalize().into_bytes();
+
+        // dbg!(hex::encode(verify_hash));
+
+        // dbg!(hash);
+
         todo!()
     }
 
@@ -92,11 +183,11 @@ impl SocketHandler {
     }
 
     async fn process_message_task(
-        mut ch_receiver: Receiver<Arc<WsMessage>>,
+        mut ch_receiver: Receiver<Message>,
         mut ws_sender: SplitSink<WebSocket, Message>,
     ) -> Result<(), Report> {
         while let Ok(message) = ch_receiver.recv().await {
-            let _ = ws_sender.send(message.as_ref().try_into().unwrap()).await;
+            let _ = ws_sender.send(message).await;
         }
         Ok(())
     }
@@ -106,6 +197,12 @@ impl SocketHandler {
         //     Self::
         //     _ => return,
         // }
+
+        // let user = self.authorize().await.unwrap();
+
+        let user = Self::authorize(&mut self.socket, &self.config)
+            .await
+            .unwrap();
 
         let initial_data = self.get_initial_data().await.unwrap();
 

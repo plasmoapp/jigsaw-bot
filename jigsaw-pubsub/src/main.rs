@@ -6,23 +6,23 @@ pub mod generator;
 pub mod jigsaw;
 pub mod storage;
 
-use std::{path::PathBuf, sync::Arc};
+use std::{sync::Arc};
 
 use eyre::Report;
 use futures::StreamExt;
 use generator::JigsawGenerator;
-use jigsaw::RawJigsawPuzzle;
+
 use jigsaw_common::{
     model::{
-        event::puzzle_generated::PuzzleGeneratedEvent, puzzle::JigsawPuzzle,
+        event::puzzle_generated::PuzzleGeneratedEvent,
         request::generate_puzzle::GeneratePuzzleRequest,
     },
     util::config::default_extract_config,
 };
-use redis::{aio::MultiplexedConnection, AsyncCommands, Msg};
+use redis::{AsyncCommands};
 use storage::{JigsawFsImageStorage, JigsawRedisStateStorage, JigsawStorage};
-use tokio::task;
-use uuid::Uuid;
+
+
 
 use crate::config::Config;
 
