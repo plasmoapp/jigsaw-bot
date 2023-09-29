@@ -23,7 +23,7 @@ pub enum WsMessage {
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "type")]
 pub enum WsRequest {
-    TelegramAuth { data_check_string: String },
+    TelegramAuth { init_data: String },
     Place { tile_uuid: Uuid, index: JigsawIndex },
 }
 

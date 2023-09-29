@@ -4,7 +4,6 @@ extern crate log;
 pub mod config;
 pub mod error;
 pub mod model;
-pub mod router;
 pub mod websocket;
 
 use error::ReportResposnse;
@@ -23,8 +22,7 @@ use tower_http::services::{ServeDir, ServeFile};
 
 use crate::{
     config::Config,
-    router::{router, ws::get_ws},
-    websocket::state::{AppState, WebSocketState},
+    websocket::{route::get_puzzle_websocket, state::AppState},
 };
 
 #[tokio::main]
@@ -32,9 +30,9 @@ async fn main() -> Result<(), Report> {
     dotenvy::dotenv()?;
     tracing_subscriber::fmt::init();
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
-
     let state = AppState::new().await?;
+
+    let addr = SocketAddr::from(([127, 0, 0, 1], state.config.port));
 
     let serve_dir_assets = ServeDir::new(&state.config.complete_storage_path);
     let serve_dir_public = ServeDir::new("public").append_index_html_on_directories(true);
@@ -42,7 +40,7 @@ async fn main() -> Result<(), Report> {
     let router = Router::new()
         .route(
             "/api/puzzle/:puzzle_uuid/websocket",
-            axum::routing::get(get_ws),
+            axum::routing::get(get_puzzle_websocket),
         )
         .nest_service("/assets", serve_dir_assets)
         .fallback_service(serve_dir_public)

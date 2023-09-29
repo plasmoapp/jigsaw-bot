@@ -13,14 +13,22 @@ use crate::{
     websocket::{handler::SocketHandler, state::AppState},
 };
 
+use super::unauthorized_handler::{UnauthorizedSocketHandler, PROTOCOLS};
+
 pub async fn get_puzzle_websocket(
     websocket: WebSocketUpgrade,
     Path(puzzle_uuid): Path<Uuid>,
     State(state): State<AppState>,
 ) -> impl IntoResponse {
     websocket
-        .protocols(SocketHandler::PROTOCOLS)
-        .on_upgrade(move |socket| async {
-            // SocketHandler::new(socket, puzzle_uuid, ws_state, config, redis_connection).handle()
+        .protocols(PROTOCOLS)
+        .on_upgrade(move |socket| async move {
+            match UnauthorizedSocketHandler::new(socket, puzzle_uuid, state)
+                .authorize()
+                .await
+            {
+                Ok(handler) => handler.handle().await,
+                Err(error) => tracing::error!("Failed to authorize socket: {error}"),
+            };
         })
 }

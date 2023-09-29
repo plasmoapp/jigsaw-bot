@@ -16,7 +16,7 @@ use eyre::Report;
 
 #[derive(Clone, Shrinkwrap)]
 pub struct AppState {
-    redis: MultiplexedConnection,
+    pub redis: MultiplexedConnection,
     #[shrinkwrap(main_field)]
     inner: Arc<AppStateInner>,
 }
