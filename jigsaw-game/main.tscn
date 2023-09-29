@@ -1,0 +1,49 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Main.gd" type="Script" id=1]
+[ext_resource path="res://scripts/DroppableArea.gd" type="Script" id=2]
+[ext_resource path="res://TilesContainer.gd" type="Script" id=3]
+
+[node name="Node" type="Node"]
+script = ExtResource( 1 )
+puzzle_uuid = "050fab02-0699-40e5-aa11-cc840ed2c53b"
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="VSplitContainer" type="VSplitContainer" parent="CanvasLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 1
+dragger_visibility = 2
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="DroppableArea" type="Control" parent="CanvasLayer/VSplitContainer"]
+unique_name_in_owner = true
+margin_right = 1024.0
+margin_bottom = 600.0
+mouse_filter = 1
+size_flags_vertical = 3
+script = ExtResource( 2 )
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/VSplitContainer"]
+margin_top = 600.0
+margin_right = 1024.0
+margin_bottom = 600.0
+mouse_filter = 1
+size_flags_vertical = 8
+scroll_vertical_enabled = false
+
+[node name="TilesContainer" type="HBoxContainer" parent="CanvasLayer/VSplitContainer/ScrollContainer"]
+unique_name_in_owner = true
+margin_right = 1024.0
+size_flags_horizontal = 3
+custom_constants/separation = 0
+script = ExtResource( 3 )
+
+[node name="Label" type="Label" parent="."]
+visible = false
+margin_right = 40.0
+margin_bottom = 14.0
+text = "Puzzle Uuid"
