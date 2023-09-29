@@ -1,7 +1,7 @@
-use std::cmp::Ordering;
-use rand::prelude::StdRng;
 use rand::{Rng, SeedableRng};
+use rand::prelude::StdRng;
 use tiny_skia::{FillRule, Mask, PathBuilder, Transform};
+
 use crate::jigsaw_connections::PieceConnection::*;
 
 #[derive(Clone, Debug)]
@@ -12,14 +12,40 @@ pub struct PieceConnections {
     pub left: PieceConnection,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum PieceConnection {
     ConnectedToNeighbor,
     NeighborConnected,
     Nothing
 }
 
+impl PieceConnection {
+    pub fn opposite(self) -> PieceConnection {
+        match self {
+            ConnectedToNeighbor => NeighborConnected,
+            NeighborConnected => ConnectedToNeighbor,
+            _ => Nothing
+        }
+    }
+
+    pub fn random(rng: &mut StdRng) -> PieceConnection {
+        match rng.gen_bool(0.5) {
+            true => ConnectedToNeighbor,
+            false => NeighborConnected
+        }
+    }
+}
+
 impl PieceConnections {
+    fn empty() -> PieceConnections {
+        PieceConnections {
+            top: Nothing,
+            right: Nothing,
+            bottom: Nothing,
+            left: Nothing,
+        }
+    }
+
     fn append_horizontal_connection_to_mask(
         pb: &mut PathBuilder,
         tile_size: f32,
@@ -248,16 +274,6 @@ impl PieceConnections {
 }
 
 impl PieceConnections {
-    fn generate_connection(rng: &mut StdRng, should_generate: bool) -> PieceConnection {
-        match should_generate {
-            true => match rng.gen_bool(0.5) {
-                true => ConnectedToNeighbor,
-                false => NeighborConnected
-            }
-            false => Nothing
-        }
-    }
-
     /// Generates a matrix of PieceConnection with specified width, height and seed.
     pub fn generate_connections_for_size(width_px: u32, height_px: u32, tile_size_px: u32, seed: Option<u64>) -> Vec<Vec<PieceConnections>>  {
         let mut rng = match seed {
@@ -268,100 +284,35 @@ impl PieceConnections {
         let width = (width_px / tile_size_px) as usize;
         let height = (height_px / tile_size_px) as usize;
 
-        let mut matrix: Vec<Vec<Option<PieceConnections>>> = vec![
-            vec![None; width];
+        let mut matrix: Vec<Vec<PieceConnections>> = vec![
+            vec![PieceConnections::empty(); width];
             height
         ];
 
-        for y in 0..height {
-            for x in 0..width {
-                let mut connection = PieceConnections {
-                    top: Self::generate_connection(&mut rng, y > 0),
-                    right: Self::generate_connection(&mut rng, x < width - 1),
-                    bottom: Self::generate_connection(&mut rng, y < height - 1),
-                    left: Self::generate_connection(&mut rng, x > 0)
-                };
+        for y in 0..(height - 1) {
+            for x in 0..(width) {
+                let connection = PieceConnection::random(&mut rng);
 
-                let top_neighbor = match y.cmp(&0) {
-                    Ordering::Greater =>
-                        matrix.get(y - 1)
-                            .map_or(None, |row| row.get(x))
-                            .unwrap_or(&None),
-                    _ => &None
-                };
-                let right_neighbor = match x.cmp(&(width - 1)) {
-                    Ordering::Less =>
-                        matrix.get(y)
-                            .map_or(None, |row| row.get(x + 1))
-                            .unwrap_or(&None),
-                    _ => &None
-                };
-                let bottom_neighbor = match y.cmp(&(height - 1)) {
-                    Ordering::Less =>
-                        matrix.get(y + 1)
-                            .map_or(None, |row| row.get(x))
-                            .unwrap_or(&None),
-                    _ => &None
-                };
-                let left_neighbor = match x.cmp(&0) {
-                    Ordering::Greater =>
-                        matrix.get(y)
-                            .map_or(None, |row| row.get(x - 1))
-                            .unwrap_or(&None),
-                    _ => &None
-                };
+                let current = &mut matrix[y][x];
+                current.bottom = connection;
 
+                let neighbor = &mut matrix[y + 1][x];
+                neighbor.top = connection.opposite();
+            }
+        }
 
-                match top_neighbor {
-                    Some(neighbor) => {
-                        if neighbor.bottom == ConnectedToNeighbor {
-                            connection.top = NeighborConnected;
-                        } else {
-                            connection.top = ConnectedToNeighbor;
-                        }
-                    }
-                    _ => {}
-                }
-                match right_neighbor {
-                    Some(neighbor) => {
-                        if neighbor.left == ConnectedToNeighbor {
-                            connection.right = NeighborConnected;
-                        } else {
-                            connection.right = ConnectedToNeighbor;
-                        }
-                    }
-                    _ => {}
-                }
-                match bottom_neighbor {
-                    Some(neighbor) => {
-                        if neighbor.top == ConnectedToNeighbor {
-                            connection.bottom = NeighborConnected;
-                        } else {
-                            connection.bottom = ConnectedToNeighbor;
-                        }
-                    }
-                    _ => {}
-                }
-                match left_neighbor {
-                    Some(neighbor) => {
-                        if neighbor.right == ConnectedToNeighbor {
-                            connection.left = NeighborConnected;
-                        } else {
-                            connection.left = ConnectedToNeighbor;
-                        }
-                    }
-                    _ => {}
-                }
+        for x in 0..(width - 1) {
+            for y in 0..height {
+                let connection = PieceConnection::random(&mut rng);
 
-                matrix[y][x] = Some(connection);
+                let current = &mut matrix[y][x];
+                current.right = connection;
+
+                let neighbor = &mut matrix[y][x + 1];
+                neighbor.left = connection.opposite();
             }
         }
 
         matrix
-            .iter()
-            .map(|row|
-                     row.iter().map(|element| element.clone().unwrap()).collect()
-            )
-            .collect()
     }
 }
