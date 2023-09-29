@@ -5,6 +5,7 @@ pub mod config;
 pub mod generator;
 pub mod jigsaw;
 pub mod storage;
+pub mod jigsaw_connections;
 
 use std::{sync::Arc};
 
@@ -118,6 +119,7 @@ mod test {
     use crate::config::Config;
 
     use eyre::Report;
+    use jigsaw_common::util::config::default_extract_config;
 
     #[tokio::test]
     async fn send_request() -> Result<(), Report> {
@@ -125,7 +127,7 @@ mod test {
 
         env_logger::init();
 
-        let config = Config::extract()?;
+        let config = default_extract_config::<Config>()?;
 
         let mut redis = redis::Client::open(config.redis_url.as_str())?
             .get_tokio_connection()

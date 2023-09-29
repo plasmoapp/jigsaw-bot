@@ -9,7 +9,7 @@ async-trait = "0.1.73"
 dotenvy = "0.15.7"
 eyre = "0.6.8"
 futures = "0.3.28"
-image = "0.24.7"
+image = { version = "0.24.7", features = ["webp", "webp-encoder"] }
 path_macro = "1.0.0"
 rayon = "1.8.0"
 redis = { version = "0.23.3", features = ["tokio-comp"] }
@@ -23,3 +23,5 @@ figment = { version = "0.10.10", features = ["env", "toml"] }
 rmp-serde = "1.1.2"
 log = "0.4.20"
 env_logger = "0.10.0"
+rand = "0.8.5"
+tiny-skia = "0.11.1"

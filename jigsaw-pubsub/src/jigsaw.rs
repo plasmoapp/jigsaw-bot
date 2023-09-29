@@ -1,18 +1,23 @@
 use eyre::Report;
-use image::{imageops::FilterType, DynamicImage, GenericImageView};
+use image::{DynamicImage, GenericImage, GenericImageView, imageops::FilterType, RgbaImage};
+use rayon::prelude::*;
+use tiny_skia::{IntSize, Pixmap};
+use uuid::Uuid;
+
 use jigsaw_common::{
     model::puzzle::{JigsawIndex, JigsawPuzzle, JigsawTile},
     util::indexed::Indexed,
 };
 
-use rayon::prelude::*;
-use uuid::Uuid;
+use crate::jigsaw_connections::PieceConnections;
 
 const BIGGER_SIDE_SIZE_PX: u32 = 640;
 
 const TILES_PER_BIGGER_SIDE: u32 = 8;
 
 const TILE_SIZE_PX: u32 = BIGGER_SIDE_SIZE_PX / TILES_PER_BIGGER_SIDE;
+const TILE_PADDING_PX: u32 = TILE_SIZE_PX / 2;
+const TILE_WITH_PADDING_SIZE_PX: u32 = TILE_SIZE_PX * 2;
 
 pub struct RawJigsawPuzzle {
     pub puzzle_source: DynamicImage,
@@ -87,6 +92,16 @@ impl RawJigsawPuzzle {
 
         let new_image = image.resize_to_fill(new_width, new_height, FilterType::Lanczos3);
 
+        let connections = PieceConnections::generate_connections_for_size(
+            new_width,
+            new_height,
+            TILE_SIZE_PX,
+            None
+        );
+
+        let tiles_x = (new_width / TILE_SIZE_PX) as usize;
+        let tiles_y = (new_height / TILE_SIZE_PX) as usize;
+
         let tile_vec = (0..new_width)
             .into_par_iter()
             .step_by(TILE_SIZE_PX as usize)
@@ -95,11 +110,65 @@ impl RawJigsawPuzzle {
                     .into_par_iter()
                     .step_by(TILE_SIZE_PX as usize)
                     .map(|corner_y| {
+                        let x = (corner_x / TILE_SIZE_PX) as usize;
+                        let y = (corner_y / TILE_SIZE_PX) as usize;
+
+                        let (crop_x, crop_width) = {
+                            if x == 0 {
+                                if tiles_x > 1 {
+                                    (0, TILE_SIZE_PX + TILE_PADDING_PX)
+                                } else {
+                                    (0, TILE_SIZE_PX)
+                                }
+                            } else if x == tiles_x - 1 {
+                                (TILE_PADDING_PX, TILE_PADDING_PX + TILE_SIZE_PX)
+                            } else {
+                                (TILE_PADDING_PX, TILE_PADDING_PX + TILE_SIZE_PX + TILE_PADDING_PX)
+                            }
+                        };
+                        let (crop_y, crop_height) = {
+                            if y == 0 {
+                                if tiles_y > 1 {
+                                    (0, TILE_SIZE_PX + TILE_PADDING_PX)
+                                } else {
+                                    (0, TILE_SIZE_PX)
+                                }
+                            } else if y == tiles_y - 1 {
+                                (TILE_PADDING_PX, TILE_PADDING_PX + TILE_SIZE_PX)
+                            } else {
+                                (TILE_PADDING_PX, TILE_PADDING_PX + TILE_SIZE_PX + TILE_PADDING_PX)
+                            }
+                        };
+
+                        let connection = connections[y][x].clone();
+
                         let index =
                             JigsawIndex::new(corner_x / TILE_SIZE_PX, corner_y / TILE_SIZE_PX);
-                        let image =
-                            new_image.crop_imm(corner_x, corner_y, TILE_SIZE_PX, TILE_SIZE_PX);
-                        RawJigsawTile::new(index, image)
+                        let crop =
+                            new_image.crop_imm(corner_x - crop_x, corner_y - crop_y, crop_width, crop_height);
+                        let mut container_image = DynamicImage::new_rgba8(TILE_WITH_PADDING_SIZE_PX, TILE_WITH_PADDING_SIZE_PX);
+
+                        container_image.copy_from(&crop, TILE_PADDING_PX - crop_x, TILE_PADDING_PX - crop_y).unwrap();
+                        let image_bytes = container_image.to_rgba8().to_vec();
+
+                        let mask = connection.create_piece_mask(TILE_WITH_PADDING_SIZE_PX, TILE_WITH_PADDING_SIZE_PX, TILE_SIZE_PX);
+
+                        let mut pixmap = Pixmap::from_vec(
+                            image_bytes,
+                            IntSize::from_wh(TILE_WITH_PADDING_SIZE_PX, TILE_WITH_PADDING_SIZE_PX).unwrap()
+                        ).unwrap();
+
+                        pixmap.apply_mask(&mask);
+
+                        let final_image = DynamicImage::from(
+                            RgbaImage::from_raw(
+                                TILE_WITH_PADDING_SIZE_PX,
+                                TILE_WITH_PADDING_SIZE_PX,
+                                pixmap.data().to_vec()
+                            ).unwrap()
+                        );
+
+                        RawJigsawTile::new(index, final_image)
                     })
                     .collect::<Vec<_>>()
             })
