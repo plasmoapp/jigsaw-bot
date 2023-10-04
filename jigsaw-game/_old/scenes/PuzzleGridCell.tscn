@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://scripts/PuzzleGridCell.gd" type="Script" id=1]
+[ext_resource path="res://_old/scripts/PuzzleGridCell.gd" type="Script" id=1]
 
 [node name="PuzzleGridCell" type="Control"]
 margin_right = 40.0

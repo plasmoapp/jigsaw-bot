@@ -1,19 +1,18 @@
+tool
 extends TextureRect
-
 class_name HttpImage
 
 signal image_loaded(image_texture)
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
-
 export var url: String
+export var autoload: bool = false
 
 func _ready():
 	$HTTPRequest.connect("request_completed", self, "_on_request_completed")
+	if autoload:
+		load_image()
 	
-func load(): 
+func load_image(): 
 	var http_error = $HTTPRequest.request(url)
 	if http_error != OK:
 		print("An error occurred in the HTTP request.")
@@ -29,9 +28,10 @@ func _on_request_completed(result, response_code, headers: PoolStringArray, body
 		print("Bad response. Status code: %s" % response_code)
 		return
 		
-	var content_type: String	
+	var content_type: String
 		
 	for header in headers:
+		header = header.to_lower()
 		if header.begins_with("content-type:"):
 			content_type = header.split(":")[1].split(",")[0].strip_edges()
 			break
@@ -59,9 +59,6 @@ func _on_request_completed(result, response_code, headers: PoolStringArray, body
 			
 	if image_error != OK:
 		print("An error occurred while trying to display the image.")
-	
-	# var json = JSON.parse(body.get_string_from_utf8())
-	# print(json.result)
 
 	var image_texture = ImageTexture.new()
 	image_texture.create_from_image(image)

@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use shrinkwraprs::Shrinkwrap;
 use url::Url;
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct User(pub UserId, pub UserData);
 
 impl User {

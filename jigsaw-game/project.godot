@@ -12,32 +12,32 @@ _global_script_classes=[ {
 "base": "Node",
 "class": "GameConfig",
 "language": "GDScript",
-"path": "res://scripts/Config.gd"
+"path": "res://global/config/config.gd"
 }, {
 "base": "Container",
 "class": "GameContainer",
 "language": "GDScript",
-"path": "res://scripts/GameContainer.gd"
+"path": "res://_old/scripts/GameContainer.gd"
 }, {
 "base": "TextureRect",
 "class": "HttpImage",
 "language": "GDScript",
-"path": "res://scripts/HttpImage.gd"
+"path": "res://components/http_image/http_image.gd"
 }, {
 "base": "Control",
 "class": "JigsawTile",
 "language": "GDScript",
-"path": "res://scripts/Tile.gd"
+"path": "res://_old/scripts/Tile.gd"
 }, {
 "base": "Control",
 "class": "PuzzleGridCell",
 "language": "GDScript",
-"path": "res://scripts/PuzzleGridCell.gd"
+"path": "res://_old/scripts/PuzzleGridCell.gd"
 }, {
 "base": "Object",
 "class": "Vector2Int",
 "language": "GDScript",
-"path": "res://scripts/Vector2Int.gd"
+"path": "res://common/vec_2_int.gd"
 } ]
 _global_script_class_icons={
 "GameConfig": "",
@@ -51,14 +51,13 @@ _global_script_class_icons={
 [application]
 
 config/name="Jigsaw Puzzle"
-run/main_scene="res://main.tscn"
+run/main_scene="res://scenes/main/Main.tscn"
 boot_splash/bg_color=Color( 0.141176, 0.141176, 0.141176, 1 )
-config/icon="res://icon.png"
 
 [autoload]
 
-ThemeManager="*res://scenes/ThemeManager.tscn"
-Config="*res://scenes/Config.tscn"
+ThemeManager="*res://global/theme_manager/ThemeManager.tscn"
+Config="*res://global/config/Config.tscn"
 
 [gui]
 
@@ -68,7 +67,7 @@ common/drop_mouse_on_gui_input_disabled=true
 
 Drag={
 "deadzone": 0.5,
-"events": [ Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"button_mask":0,"position":Vector2( 0, 0 ),"global_position":Vector2( 0, 0 ),"factor":1.0,"button_index":1,"canceled":false,"pressed":false,"doubleclick":false,"script":null)
+"events": [ Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"button_mask":0,"position":Vector2( 0, 0 ),"global_position":Vector2( 0, 0 ),"factor":1.0,"button_index":1,"pressed":false,"doubleclick":false,"script":null)
  ]
 }
 
