@@ -15,9 +15,9 @@ use teloxide::{
     requests::Requester,
     respond,
     types::{
-        CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, InlineQuery, InlineQueryResult,
-        InlineQueryResultArticle, InlineQueryResultAudio, InlineQueryResultPhoto,
-        InputMessageContent, InputMessageContentText, Message, PhotoSize, Update, WebAppInfo,
+        InlineKeyboardButton, InlineKeyboardMarkup, InlineQuery, InlineQueryResult,
+        InlineQueryResultArticle,
+        InputMessageContent, InputMessageContentText, Message, Update,
     },
     Bot,
 };

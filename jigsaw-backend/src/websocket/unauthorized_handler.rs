@@ -1,29 +1,25 @@
-use std::{collections::HashMap, str::FromStr, sync::Arc};
+use std::{collections::HashMap};
 
-use axum::extract::ws::{Message, WebSocket};
+use axum::extract::ws::{WebSocket};
 use chrono::{Duration, NaiveDateTime, Utc};
-use futures::{stream::SplitSink, SinkExt, StreamExt};
+use futures::{StreamExt};
 use itertools::Itertools;
-use jigsaw_common::{
-    model::puzzle::{JigsawTile, PublicJigsawTile},
-    redis_scheme::RedisScheme,
-};
+
 use pipe_trait::Pipe;
-use redis::{aio::MultiplexedConnection, AsyncCommands};
-use tokio::sync::broadcast::Receiver;
+use redis::{AsyncCommands};
+
 use uuid::Uuid;
 
 use crate::{
-    config::Config,
     model::user::{TelegramUser, User},
 };
 
-use eyre::Report;
+
 
 use super::{
     error::SocketError,
     handler::SocketHandler,
-    message::{WsMessage, WsRequest},
+    message::{WsRequest},
     state::AppState,
 };
 

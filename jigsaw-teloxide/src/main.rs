@@ -6,7 +6,7 @@ use std::sync::Arc;
 
 use config::Config;
 use jigsaw_common::{
-    model::request::generate_puzzle::GeneratePuzzleRequest, redis_scheme::RedisScheme,
+    redis_scheme::RedisScheme,
     util::config::default_extract_config,
 };
 

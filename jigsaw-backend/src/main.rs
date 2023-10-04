@@ -3,22 +3,18 @@ pub mod error;
 pub mod model;
 pub mod websocket;
 
-use error::ReportResposnse;
-use eyre::{bail, Report};
+
+use eyre::{Report};
 
 use axum::{
-    http::StatusCode,
-    response::IntoResponse,
-    routing::{get, post},
-    Extension, Json, Router,
+    Router,
 };
-use jigsaw_common::util::config::default_extract_config;
-use serde::{Deserialize, Serialize};
-use std::{net::SocketAddr, sync::Arc};
-use tower_http::services::{ServeDir, ServeFile};
+
+
+use std::{net::SocketAddr};
+use tower_http::services::{ServeDir};
 
 use crate::{
-    config::Config,
     websocket::{route::get_puzzle_websocket, state::AppState},
 };
 

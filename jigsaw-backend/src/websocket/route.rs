@@ -1,16 +1,14 @@
-use std::sync::Arc;
+
 
 use axum::{
     extract::{Path, State, WebSocketUpgrade},
     response::IntoResponse,
-    Extension,
 };
-use redis::aio::MultiplexedConnection;
+
 use uuid::Uuid;
 
 use crate::{
-    config::Config,
-    websocket::{handler::SocketHandler, state::AppState},
+    websocket::{state::AppState},
 };
 
 use super::unauthorized_handler::{UnauthorizedSocketHandler, PROTOCOLS};

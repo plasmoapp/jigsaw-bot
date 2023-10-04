@@ -12,12 +12,11 @@ use teloxide::{
     payloads::SendMessageSetters,
     requests::Requester,
     types::{
-        ChatId, InlineKeyboardButton, InlineKeyboardButtonKind, InlineKeyboardMarkup, Message,
-        WebAppInfo,
+        ChatId, InlineKeyboardButton, InlineKeyboardMarkup,
     },
     Bot,
 };
-use url::Url;
+
 
 use crate::config::Config;
 

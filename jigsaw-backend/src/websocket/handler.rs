@@ -13,7 +13,7 @@ use redis::{aio::MultiplexedConnection, AsyncCommands};
 use tokio::sync::broadcast::{Receiver, Sender};
 use uuid::Uuid;
 
-use crate::model::user::{User, UserId};
+use crate::model::user::{User};
 
 use super::{
     message::{WsMessage, WsRequest},
@@ -84,7 +84,7 @@ impl SocketHandler {
     }
 
     async fn process_request_task(
-        mut ch_sender: Sender<Message>,
+        ch_sender: Sender<Message>,
         mut ws_receiver: SplitStream<WebSocket>,
         user: User,
         _puzzle_uuid: Uuid,
@@ -100,7 +100,7 @@ impl SocketHandler {
             };
 
             match request {
-                WsRequest::Place { tile_uuid, index } => {}
+                WsRequest::Place { tile_uuid: _, index: _ } => {}
                 WsRequest::Chat { message } => {
                     if let Ok(chat_message) = (WsMessage::Chat {
                         user: user.0,
