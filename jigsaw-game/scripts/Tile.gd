@@ -16,13 +16,11 @@ enum STATE { DEFAULT, PROCESSING, CORRECT, WRONG }
 
 var state: int = STATE.DEFAULT
 
-onready var global: GlobalState = get_node("/root/Global")
-onready var image_url := "%s/assets/%s/%s.jpeg" % [global.base_url, puzzle_uuid, tile_uuid]
-onready var place_url := "%s/api/puzzle/%s/tile/%s/place" % [global.base_url, puzzle_uuid, tile_uuid]
+onready var config: GameConfig = get_node("/root/Config")
+onready var image_url := "%s/assets/%s/%s.webp" % [config.base_url, puzzle_uuid, tile_uuid]
+onready var place_url := "%s/api/puzzle/%s/tile/%s/place" % [config.base_url, puzzle_uuid, tile_uuid]
 onready var http_image := $HttpImage
 onready var http_request := $HTTPRequest
-
-#var texture: ImageTexture = null
 
 func _ready():
 	http_request.connect("request_completed", self, "_on_request_completed")

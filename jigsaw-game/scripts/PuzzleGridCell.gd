@@ -6,7 +6,7 @@ var index: Vector2Int
 
 var tile: JigsawTile = null
 
-onready var global = get_node("/root/Global")
+onready var config: GameConfig = get_node("/root/Config")
 
 onready var tile_container = $TileContainer
 

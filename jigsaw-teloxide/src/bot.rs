@@ -1,9 +1,14 @@
 use std::{path::PathBuf, sync::Arc};
 
-use jigsaw_common::model::request::generate_puzzle::GeneratePuzzleRequest;
+use dptree::case;
+use jigsaw_common::{
+    model::request::generate_puzzle::GeneratePuzzleRequest, redis_scheme::RedisScheme,
+};
 use redis::aio::MultiplexedConnection;
 use teloxide::{
     dispatching::{UpdateFilterExt, UpdateHandler},
+    filter_command,
+    macros::BotCommands,
     net::Download,
     payloads::SendMessageSetters,
     prelude::Dispatcher,
@@ -11,8 +16,8 @@ use teloxide::{
     respond,
     types::{
         CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, InlineQuery, InlineQueryResult,
-        InlineQueryResultArticle, InputMessageContent, InputMessageContentText, Message, PhotoSize,
-        Update, WebAppInfo,
+        InlineQueryResultArticle, InlineQueryResultAudio, InlineQueryResultPhoto,
+        InputMessageContent, InputMessageContentText, Message, PhotoSize, Update, WebAppInfo,
     },
     Bot,
 };
@@ -20,7 +25,16 @@ use uuid::Uuid;
 
 use crate::config::Config;
 
+use teloxide::types::File as TelegramFile;
+
 use eyre::Report;
+
+#[derive(Clone, BotCommands)]
+#[command(rename_rule = "lowercase")]
+pub enum Command {
+    Start,
+    Help,
+}
 
 pub async fn bot_main(bot: Bot, config: Arc<Config>, redis_connection: MultiplexedConnection) {
     Dispatcher::builder(bot, schema())
@@ -32,55 +46,75 @@ pub async fn bot_main(bot: Bot, config: Arc<Config>, redis_connection: Multiplex
 }
 
 fn schema() -> UpdateHandler<Report> {
-    dptree::entry().branch(Update::filter_message().endpoint(message_handler))
-    // .branch(Update::filter_inline_query().endpoint(inline_handler))
-    // .branch(Update::filter_callback_query().endpoint(callback_handler))
+    let command_branch = filter_command::<Command, _>()
+        .branch(case![Command::Help].endpoint(help_handler))
+        .branch(case![Command::Start].endpoint(start_handler));
+
+    dptree::entry()
+        .branch(
+            Update::filter_message()
+                .branch(dptree::filter_map_async(filter_photo).endpoint(photo_handler))
+                .branch(command_branch)
+                .endpoint(help_handler),
+        )
+        .branch(Update::filter_inline_query().endpoint(inline_handler))
 }
 
-fn get_first_photo(message: &Message) -> Option<&PhotoSize> {
-    message.photo()?.last()
+// A function that filters out messages that have a photo and passes the photo to the dependency tree
+// After that you can use File as an endpoint parameter
+async fn filter_photo(message: Message, bot: Bot) -> Option<TelegramFile> {
+    let photo = message.photo()?.last()?;
+    let telegram_file = bot.get_file(&photo.file.id).await.ok()?;
+    Some(telegram_file)
 }
 
 fn get_file_name(file: &teloxide::types::File) -> Option<String> {
     Some(PathBuf::from(&file.path).file_name()?.to_str()?.to_string())
 }
 
-async fn message_handler(
+async fn photo_handler(
     bot: Bot,
     message: Message,
+    telegram_file: TelegramFile,
     config: Arc<Config>,
     mut redis_connection: MultiplexedConnection,
 ) -> Result<(), Report> {
-    let Some(photo) = get_first_photo(&message) else {
-        return Ok(())
-    };
+    // Download a photo so generator can access it later
 
-    let telegram_file = bot.get_file(&photo.file.id).await?;
-
-    let Some(file_name) = get_file_name(&telegram_file) else {
-        return Ok(())
-    };
+    let file_name = get_file_name(&telegram_file).expect("File name should alaways be valid");
 
     let mut file_path = config.request_storage_path.clone();
+
     file_path.push(&file_name);
 
     let mut fs_file = tokio::fs::File::create(file_path).await?;
 
     bot.download_file(&telegram_file.path, &mut fs_file).await?;
 
+    // Send a request to the puzzle generator to generate a puzzle using redis
+
     let request = GeneratePuzzleRequest {
         uuid: Uuid::new_v4(),
         image_path: PathBuf::from(file_name),
     };
 
-    let data_key = format!("request_message_data:{}", request.uuid);
+    // We also store a chat id in Redis so we can notify the user that the puzzle was generated
+    // I choose not to put message id in the request to make it less coupled together
+    // The generator module doesn't need to be aware of what is consuming its result
+
+    let data_key = RedisScheme::request_message_data(&request.uuid);
 
     redis::pipe()
         .set(&data_key, rmp_serde::to_vec(&message.chat.id)?)
         .expire(&data_key, 60)
-        .publish("request:generate_puzzle", rmp_serde::to_vec(&request)?)
+        .publish(
+            RedisScheme::REQUEST_GENERATE_PUZZLE,
+            rmp_serde::to_vec(&request)?,
+        )
         .query_async(&mut redis_connection)
         .await?;
+
+    // Notify user that the puzzle is being generated
 
     bot.send_message(message.chat.id, "Generating puzzle...")
         .reply_to_message_id(message.id)
@@ -89,55 +123,41 @@ async fn message_handler(
     Ok(())
 }
 
-// async fn inline_handler(bot: Bot, query: InlineQuery, config: Arc<Config>) -> Result<(), Report> {
-//     dbg!(&query);
+async fn help_handler(bot: Bot, message: Message) -> Result<(), Report> {
+    bot.send_message(message.chat.id, "Send an image to create a puzzle.")
+        .await?;
+    Ok(())
+}
 
-//     let puzzle_uuid = Uuid::parse_str(&query.query)?;
+async fn start_handler(bot: Bot, message: Message) -> Result<(), Report> {
+    bot.send_message(message.chat.id, "Welcome to the Jigsaw Puzzle bot!\n\nYou can turn any image into a jigsaw puzzle and then solve it together with friends without leaving Telegram.\n\nSend an image to create a puzzle.")
+        .await?;
+    Ok(())
+}
 
-//     let mut url = config.web_app_url.clone();
+async fn inline_handler(bot: Bot, query: InlineQuery, config: Arc<Config>) -> Result<(), Report> {
+    let puzzle_uuid = Uuid::parse_str(&query.query)?;
 
-//     url.query_pairs_mut()
-//         .append_pair("puzzle", &puzzle_uuid.to_string());
+    let button = InlineKeyboardButton::url("Play", config.get_puzzle_url(&puzzle_uuid));
 
-//     let button = InlineKeyboardButton::web_app("Play", WebAppInfo { url });
+    let image = config.get_puzzle_source_url(&puzzle_uuid);
 
-//     let article = InlineQueryResultArticle::new(
-//         "share".to_string(),
-//         "Share puzzle",
-//         InputMessageContent::Text(InputMessageContentText::new("Jigsaw Puzzle")),
-//     )
-//     .reply_markup(InlineKeyboardMarkup::new([[button]]));
+    let article = InlineQueryResultArticle::new(
+        "share".to_string(),
+        "Share the puzzle",
+        InputMessageContent::Text(InputMessageContentText::new(
+            "Solve a Jigsaw Puzzle together!",
+        )),
+    )
+    .thumb_url(image)
+    .description("Click here to share")
+    .reply_markup(InlineKeyboardMarkup::new([[button]]));
 
-//     let results = vec![InlineQueryResultButton];
+    let results = [InlineQueryResult::Article(article)];
 
-//     bot.answer_inline_query(&query.id, results).await?;
+    bot.answer_inline_query(&query.id, results).await?;
 
-//     respond(())?;
+    respond(())?;
 
-//     Ok(())
-// }
-
-// pub async fn callback_handler(
-//     bot: Bot,
-//     query: CallbackQuery,
-//     // storage: Arc<ConcurrentHashMap<String, Game>>,
-// ) -> Result<(), Report> {
-//     dbg!(query);
-// let state = storage
-//     .get_or_default(q.inline_message_id.as_ref().unwrap())
-//     .await;
-
-// let mut lock = state.lock().await;
-
-// match lock.process_callback(q.clone()) {
-//     Ok(_) => update_message(bot, q, &lock).await?,
-//     Err(error) => {
-//         bot.answer_callback_query(q.id)
-//             .text(error.to_string())
-//             .show_alert(true)
-//             .await?;
-//     }
-// };
-
-//     Ok(())
-// }
+    Ok(())
+}

@@ -4,7 +4,7 @@
 <head>
 	<meta charset='utf-8' />
 	<meta name='viewport' content='width=device-width, user-scalable=no' />
-	<title>Jigsaw Puzzle</title>
+	<title>$GODOT_PROJECT_NAME</title>
 	<style type='text/css'>
 		body {
 			touch-action: none;
@@ -135,12 +135,7 @@
 			visibility: visible;
 		}
 	</style>
-	<link id='-gd-engine-icon' rel='icon' type='image/png' href='index.icon.png' />
-<link rel='apple-touch-icon' href='index.apple-touch-icon.png'/>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script>
-window.Telegram.WebApp.expand();
-</script>
+	$GODOT_HEAD_INCLUDE
 </head>
 
 <body>
@@ -165,10 +160,10 @@ window.Telegram.WebApp.expand();
 		<div id='status-notice' class='godot' style='display: none;'></div>
 	</div>
 
-	<script type='text/javascript' src='index.js'></script>
+	<script type='text/javascript' src='$GODOT_URL'></script>
 	<script type='text/javascript'>//<![CDATA[
 
-		const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":35024,"index.wasm":17855610},"focusCanvas":true,"gdnativeLibs":[]};
+		const GODOT_CONFIG = $GODOT_CONFIG;
 		var engine = new Engine(GODOT_CONFIG);
 
 		(function () {

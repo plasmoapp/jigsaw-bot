@@ -7,8 +7,9 @@ onready var field_scene := load("res://scenes/GameField.tscn")
 
 onready var droppable_area := get_node("%DroppableArea")
 onready var tile_container := get_node("%TilesContainer")
+onready var game_container := get_node("%GameContainer")
 
-onready var global: GlobalState = get_node("/root/Global")
+onready var config: GameConfig = get_node("/root/Config")
 
 var client = WebSocketClient.new()
 
@@ -31,7 +32,7 @@ func _ready():
 		# puzzle_uuid = JavaScript.eval("(new URLSearchParams(window.location.search)).get('puzzle')")
 		print("Got puzzle uuid: %s" % puzzle_uuid)
 	
-	var url = "%s/api/puzzle/%s/websocket" % [global.base_ws_url, puzzle_uuid]
+	var url = "%s/api/puzzle/%s/websocket" % [config.base_ws_url, puzzle_uuid]
 	
 	client.set_verify_ssl_enabled(true)
 	
@@ -55,7 +56,7 @@ func _connected(proto = ""):
 	print("Connected with protocol: ", proto)
 	if proto == "jigsaw-telegram-auth":
 		var data = JavaScript.eval("window.Telegram.WebApp.initData", true)
-		var request = '{"type":"telegram_auth","data_check_string":"%s"}' % data
+		var request = '{"type":"telegram_auth","init_data":"%s"}' % data
 		var error = client.get_peer(1).put_packet(request.to_utf8())
 		
 		if error != OK:
@@ -63,7 +64,9 @@ func _connected(proto = ""):
 
 func _on_data():
 	
-	var result = JSON.parse(client.get_peer(1).get_packet().get_string_from_utf8())
+	var string = client.get_peer(1).get_packet().get_string_from_utf8()
+	
+	var result = JSON.parse(string)
 	
 	if result.error:
 		print("Error while parsing JSON")
@@ -76,7 +79,7 @@ func _on_data():
 		field_instance = field_scene.instance()
 		field_instance.puzzle_uuid = puzzle_uuid
 		droppable_area.add_child(field_instance)
-		initial_tiles = data["data"]
+		initial_tiles = data["state"]
 		field_instance.connect("grid_initialized", self, "_on_grid_initalized")
 	elif type == "placed":
 		var tiles = get_tree().get_nodes_in_group("tiles")
@@ -88,7 +91,7 @@ func _on_data():
 			var duplicate = tile.duplicate()
 			var index_vec = Vector2Int.new(data["index"]["x"], data["index"]["y"])
 			var cell = field_instance.cell_map[index_vec.as_string()]
-			global.connect("tile_size_change", duplicate, "_on_tile_size_change")
+			#global.connect("tile_size_change", duplicate, "_on_tile_size_change")
 			cell.set_tile(duplicate, true)
 			tile.queue_free()
 			break
@@ -103,8 +106,8 @@ func _on_grid_initalized(cell_map: Dictionary):
 		if index:
 			var index_vec = Vector2Int.new(index.x, index.y)
 			var cell = cell_map[index_vec.as_string()]
-			global.connect("tile_size_change", tile_instance, "_on_tile_size_change")
+			#global.connect("tile_size_change", tile_instance, "_on_tile_size_change")
 			cell.set_tile(tile_instance, true)
 		else:
-			global.connect("tile_size_change", tile_instance, "_on_tile_size_change")
+			#global.connect("tile_size_change", tile_instance, "_on_tile_size_change")
 			tile_container.add_child(tile_instance)

@@ -10,9 +10,14 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "Node",
-"class": "GlobalState",
+"class": "GameConfig",
 "language": "GDScript",
-"path": "res://scripts/GlobalState.gd"
+"path": "res://scripts/Config.gd"
+}, {
+"base": "Container",
+"class": "GameContainer",
+"language": "GDScript",
+"path": "res://scripts/GameContainer.gd"
 }, {
 "base": "TextureRect",
 "class": "HttpImage",
@@ -35,7 +40,8 @@ _global_script_classes=[ {
 "path": "res://scripts/Vector2Int.gd"
 } ]
 _global_script_class_icons={
-"GlobalState": "",
+"GameConfig": "",
+"GameContainer": "",
 "HttpImage": "",
 "JigsawTile": "",
 "PuzzleGridCell": "",
@@ -51,8 +57,8 @@ config/icon="res://icon.png"
 
 [autoload]
 
-Global="*res://scripts/GlobalState.gd"
-ThemeManager="*res://scripts/ThemeManager.gd"
+ThemeManager="*res://scenes/ThemeManager.tscn"
+Config="*res://scenes/Config.tscn"
 
 [gui]
 

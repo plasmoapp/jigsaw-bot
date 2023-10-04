@@ -4,10 +4,10 @@ extern crate log;
 pub mod config;
 pub mod generator;
 pub mod jigsaw;
-pub mod storage;
 pub mod jigsaw_connections;
+pub mod storage;
 
-use std::{sync::Arc};
+use std::sync::Arc;
 
 use eyre::Report;
 use futures::StreamExt;
@@ -18,12 +18,11 @@ use jigsaw_common::{
         event::puzzle_generated::PuzzleGeneratedEvent,
         request::generate_puzzle::GeneratePuzzleRequest,
     },
+    redis_scheme::RedisScheme,
     util::config::default_extract_config,
 };
-use redis::{AsyncCommands};
+use redis::AsyncCommands;
 use storage::{JigsawFsImageStorage, JigsawRedisStateStorage, JigsawStorage};
-
-
 
 use crate::config::Config;
 
@@ -96,7 +95,7 @@ async fn main() -> Result<(), Report> {
             let Ok(message) = rmp_serde::to_vec(&event) else { return };
 
             let result: Result<(), _> = redis_connection
-                .publish("event:puzzle_generated", message)
+                .publish(RedisScheme::EVENT_PUZZLE_GENERATED, message)
                 .await;
 
             if let Err(error) = result {

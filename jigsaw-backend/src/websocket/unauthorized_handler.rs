@@ -1,6 +1,7 @@
 use std::{collections::HashMap, str::FromStr, sync::Arc};
 
 use axum::extract::ws::{Message, WebSocket};
+use chrono::{Duration, NaiveDateTime, Utc};
 use futures::{stream::SplitSink, SinkExt, StreamExt};
 use itertools::Itertools;
 use jigsaw_common::{
@@ -108,6 +109,18 @@ impl UnauthorizedSocketHandler {
 
         if !verify {
             Err(SocketError::InvalidCredentials)?;
+        }
+
+        let auth_date = query
+            .get("auth_date")
+            .and_then(|date| date.parse::<i64>().ok())
+            .and_then(|date| NaiveDateTime::from_timestamp_opt(date, 0))
+            .ok_or(SocketError::InvalidCredentials)?;
+
+        let now = Utc::now().naive_utc();
+
+        if now.signed_duration_since(auth_date) > Duration::minutes(15) {
+            Err(SocketError::CredentialsExpired)?;
         }
 
         let user: TelegramUser = query

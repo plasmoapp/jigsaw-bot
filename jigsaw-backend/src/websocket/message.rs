@@ -1,21 +1,34 @@
 use std::collections::HashMap;
 
 use axum::extract::ws::Message;
-use jigsaw_common::model::puzzle::{JigsawIndex, PublicJigsawTile};
+use jigsaw_common::model::puzzle::{JigsawIndex, JigsawMeta, PublicJigsawTile};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+
+use crate::model::user::{User, UserId};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 #[serde(tag = "type")]
 pub enum WsMessage {
     Initial {
-        data: HashMap<Uuid, PublicJigsawTile>,
+        meta: JigsawMeta,
+        state: HashMap<Uuid, PublicJigsawTile>,
     },
     Placed {
-        // user: UserId,
+        user: UserId,
         tile_uuid: Uuid,
         index: JigsawIndex,
+    },
+    Join {
+        user: User,
+    },
+    Leave {
+        user: UserId,
+    },
+    Chat {
+        user: UserId,
+        message: String,
     },
 }
 
@@ -25,6 +38,7 @@ pub enum WsMessage {
 pub enum WsRequest {
     TelegramAuth { init_data: String },
     Place { tile_uuid: Uuid, index: JigsawIndex },
+    Chat { message: String },
 }
 
 impl TryFrom<Message> for WsRequest {

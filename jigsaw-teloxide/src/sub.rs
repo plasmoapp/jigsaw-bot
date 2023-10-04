@@ -17,6 +17,7 @@ use teloxide::{
     },
     Bot,
 };
+use url::Url;
 
 use crate::config::Config;
 
@@ -38,13 +39,13 @@ pub async fn pubsub_main(
             let event = match event_result {
                 Ok(request) => request,
                 Err(error) => {
-                    error!("Received invalid request: {error}");
+                    error!("Received an invalid message: {error}");
                     return;
                 }
             };
 
             if let Err(error) = process_event(event, bot, config, redis_connection).await {
-                error!("Error while processing event: {error}");
+                error!("Error while processing an event: {error}");
             }
         });
     }
@@ -60,26 +61,21 @@ pub async fn process_event(
     let message_raw = redis_connection.get::<_, Vec<u8>>(data_key).await?;
     let message = rmp_serde::from_slice::<ChatId>(&message_raw)?;
 
-    let mut url = config.web_app_url.clone();
+    let puzzle_uuid = match event.puzzle_uuid {
+        Some(puzzle_uuid) => puzzle_uuid,
+        None => {
+            bot.send_message(message, "Failed to create a puzzle. It's likely that the image is too small. Try a different one!").await?;
+            return Ok(());
+        }
+    };
 
-    url.query_pairs_mut()
-        .append_pair("puzzle", &event.puzzle_uuid.unwrap().to_string());
-
-    // dbg!(&url);
-
-    // TODO: Handle Error
-    // url.path_segments_mut()
-    //     .unwrap()
-    //     .push("puzzle")
-    //     .push(&event.puzzle_uuid.unwrap().to_string());
-
-    let play_button = InlineKeyboardButton::web_app("Open", WebAppInfo { url });
+    let play_button = InlineKeyboardButton::url("Play alone", config.get_puzzle_url(&puzzle_uuid));
     let share_button: InlineKeyboardButton =
-        InlineKeyboardButton::switch_inline_query("Share", event.puzzle_uuid.unwrap().to_string());
+        InlineKeyboardButton::switch_inline_query("Share with friends", puzzle_uuid.to_string());
 
-    let keyboard = InlineKeyboardMarkup::new([[play_button], [share_button]]);
+    let keyboard = InlineKeyboardMarkup::new([[share_button], [play_button]]);
 
-    bot.send_message(message, "Puzzle generated succesfully")
+    bot.send_message(message, "Done! Now share it with friends or play alone")
         .reply_markup(keyboard)
         .await?;
 

@@ -1,11 +1,11 @@
 use eyre::Report;
-use image::{DynamicImage, GenericImage, GenericImageView, imageops::FilterType, RgbaImage};
+use image::{imageops::FilterType, DynamicImage, GenericImage, GenericImageView, RgbaImage};
 use rayon::prelude::*;
 use tiny_skia::{IntSize, Pixmap};
 use uuid::Uuid;
 
 use jigsaw_common::{
-    model::puzzle::{JigsawIndex, JigsawPuzzle, JigsawTile},
+    model::puzzle::{JigsawIndex, JigsawMeta, JigsawPuzzle, JigsawTile},
     util::indexed::Indexed,
 };
 
@@ -22,11 +22,13 @@ const TILE_WITH_PADDING_SIZE_PX: u32 = TILE_SIZE_PX * 2;
 pub struct RawJigsawPuzzle {
     pub puzzle_source: DynamicImage,
     pub tile_vec: Vec<RawJigsawTile>,
+    pub meta: JigsawMeta,
 }
 
 pub struct IndexedRawJigsawPuzzle {
     pub puzzle_source: Indexed<Uuid, DynamicImage>,
     pub tile_vec: Vec<Indexed<Uuid, RawJigsawTile>>,
+    pub meta: JigsawMeta,
 }
 
 impl From<RawJigsawPuzzle> for IndexedRawJigsawPuzzle {
@@ -38,6 +40,7 @@ impl From<RawJigsawPuzzle> for IndexedRawJigsawPuzzle {
                 .into_iter()
                 .map(|value| value.into())
                 .collect(),
+            meta: value.meta,
         }
     }
 }
@@ -51,6 +54,7 @@ impl From<IndexedRawJigsawPuzzle> for JigsawPuzzle {
                 .into_iter()
                 .map(|tile| (tile.id, JigsawTile::from(tile.value.index)))
                 .collect(),
+            value.meta,
         )
     }
 }
@@ -96,7 +100,7 @@ impl RawJigsawPuzzle {
             new_width,
             new_height,
             TILE_SIZE_PX,
-            None
+            None,
         );
 
         let tiles_x = (new_width / TILE_SIZE_PX) as usize;
@@ -123,7 +127,10 @@ impl RawJigsawPuzzle {
                             } else if x == tiles_x - 1 {
                                 (TILE_PADDING_PX, TILE_PADDING_PX + TILE_SIZE_PX)
                             } else {
-                                (TILE_PADDING_PX, TILE_PADDING_PX + TILE_SIZE_PX + TILE_PADDING_PX)
+                                (
+                                    TILE_PADDING_PX,
+                                    TILE_PADDING_PX + TILE_SIZE_PX + TILE_PADDING_PX,
+                                )
                             }
                         };
                         let (crop_y, crop_height) = {
@@ -136,7 +143,10 @@ impl RawJigsawPuzzle {
                             } else if y == tiles_y - 1 {
                                 (TILE_PADDING_PX, TILE_PADDING_PX + TILE_SIZE_PX)
                             } else {
-                                (TILE_PADDING_PX, TILE_PADDING_PX + TILE_SIZE_PX + TILE_PADDING_PX)
+                                (
+                                    TILE_PADDING_PX,
+                                    TILE_PADDING_PX + TILE_SIZE_PX + TILE_PADDING_PX,
+                                )
                             }
                         };
 
@@ -144,19 +154,34 @@ impl RawJigsawPuzzle {
 
                         let index =
                             JigsawIndex::new(corner_x / TILE_SIZE_PX, corner_y / TILE_SIZE_PX);
-                        let crop =
-                            new_image.crop_imm(corner_x - crop_x, corner_y - crop_y, crop_width, crop_height);
-                        let mut container_image = DynamicImage::new_rgba8(TILE_WITH_PADDING_SIZE_PX, TILE_WITH_PADDING_SIZE_PX);
+                        let crop = new_image.crop_imm(
+                            corner_x - crop_x,
+                            corner_y - crop_y,
+                            crop_width,
+                            crop_height,
+                        );
+                        let mut container_image = DynamicImage::new_rgba8(
+                            TILE_WITH_PADDING_SIZE_PX,
+                            TILE_WITH_PADDING_SIZE_PX,
+                        );
 
-                        container_image.copy_from(&crop, TILE_PADDING_PX - crop_x, TILE_PADDING_PX - crop_y).unwrap();
+                        container_image
+                            .copy_from(&crop, TILE_PADDING_PX - crop_x, TILE_PADDING_PX - crop_y)
+                            .unwrap();
                         let image_bytes = container_image.to_rgba8().to_vec();
 
-                        let mask = connection.create_piece_mask(TILE_WITH_PADDING_SIZE_PX, TILE_WITH_PADDING_SIZE_PX, TILE_SIZE_PX);
+                        let mask = connection.create_piece_mask(
+                            TILE_WITH_PADDING_SIZE_PX,
+                            TILE_WITH_PADDING_SIZE_PX,
+                            TILE_SIZE_PX,
+                        );
 
                         let mut pixmap = Pixmap::from_vec(
                             image_bytes,
-                            IntSize::from_wh(TILE_WITH_PADDING_SIZE_PX, TILE_WITH_PADDING_SIZE_PX).unwrap()
-                        ).unwrap();
+                            IntSize::from_wh(TILE_WITH_PADDING_SIZE_PX, TILE_WITH_PADDING_SIZE_PX)
+                                .unwrap(),
+                        )
+                        .unwrap();
 
                         pixmap.apply_mask(&mask);
 
@@ -164,8 +189,9 @@ impl RawJigsawPuzzle {
                             RgbaImage::from_raw(
                                 TILE_WITH_PADDING_SIZE_PX,
                                 TILE_WITH_PADDING_SIZE_PX,
-                                pixmap.data().to_vec()
-                            ).unwrap()
+                                pixmap.data().to_vec(),
+                            )
+                            .unwrap(),
                         );
 
                         RawJigsawTile::new(index, final_image)
@@ -174,13 +200,22 @@ impl RawJigsawPuzzle {
             })
             .collect::<Vec<_>>();
 
-        Ok(RawJigsawPuzzle::new(new_image, tile_vec))
+        Ok(RawJigsawPuzzle::new(
+            new_image,
+            tile_vec,
+            JigsawMeta::new(TILE_SIZE_PX, (new_width, new_height)),
+        ))
     }
 
-    pub fn new(puzzle_source: DynamicImage, tile_vec: Vec<RawJigsawTile>) -> Self {
+    pub fn new(
+        puzzle_source: DynamicImage,
+        tile_vec: Vec<RawJigsawTile>,
+        meta: JigsawMeta,
+    ) -> Self {
         Self {
             puzzle_source,
             tile_vec,
+            meta,
         }
     }
 }

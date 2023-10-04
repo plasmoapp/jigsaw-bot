@@ -6,7 +6,8 @@ use std::sync::Arc;
 
 use config::Config;
 use jigsaw_common::{
-    model::request::generate_puzzle::GeneratePuzzleRequest, util::config::default_extract_config,
+    model::request::generate_puzzle::GeneratePuzzleRequest, redis_scheme::RedisScheme,
+    util::config::default_extract_config,
 };
 
 use eyre::Report;
@@ -32,7 +33,9 @@ async fn main() -> Result<(), Report> {
         .await?
         .into_pubsub();
 
-    redis_pubsub.subscribe("event:puzzle_generated").await?;
+    redis_pubsub
+        .subscribe(RedisScheme::EVENT_PUZZLE_GENERATED)
+        .await?;
 
     tokio::select! {
         _ = tokio::task::spawn(bot_main(bot.clone(), config.clone(), redis_connection.clone())) => {},

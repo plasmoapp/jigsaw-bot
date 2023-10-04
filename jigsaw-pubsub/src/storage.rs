@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use eyre::Report;
 use futures::{stream, StreamExt, TryStreamExt};
 use image::ImageFormat;
-use jigsaw_common::model::{puzzle::JigsawPuzzle};
+use jigsaw_common::{model::puzzle::JigsawPuzzle, redis_scheme::RedisScheme};
 use path_macro::path;
 use redis::{aio::MultiplexedConnection, AsyncCommands};
 
@@ -61,7 +61,7 @@ impl JigsawImageStorage for JigsawFsImageStorage {
 
         tokio::fs::create_dir_all(&puzzle_dir).await?;
 
-        let puzzle_source_path = path!(&puzzle_dir / "source.jpeg");
+        let puzzle_source_path = path!(&puzzle_dir / "source.webp");
 
         let puzzle_dir_ref = &puzzle_dir;
 
@@ -99,17 +99,23 @@ impl JigsawStateStorage for JigsawRedisStateStorage {
 
         let mut redis_connection = self.redis_connection.clone();
 
-        let key = format!("jigsaw_puzzle_state:{}", puzzle.uuid);
+        let state_key = RedisScheme::jigsaw_puzzle_state(&puzzle.uuid);
 
-        let map = puzzle
+        let state_map = puzzle
             .tile_map
             .iter()
             .map(|(key, value)| Ok((key.to_string(), rmp_serde::to_vec(&value)?)))
             .collect::<Result<Vec<(_, _)>, Report>>()?;
 
-        debug!("Storing puzzle with the key: {key}");
+        let meta_key = RedisScheme::jigsaw_puzzle_meta(&puzzle.uuid);
 
-        redis_connection.hset_multiple(key, &map).await?;
+        let meta = rmp_serde::to_vec(&puzzle.meta)?;
+
+        redis::pipe()
+            .hset_multiple(state_key, &state_map)
+            .set(meta_key, meta)
+            .query_async(&mut redis_connection)
+            .await?;
 
         Ok(puzzle)
     }

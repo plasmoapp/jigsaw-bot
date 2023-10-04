@@ -14,7 +14,7 @@ eyre = "0.6.8"
 figment = { version = "0.10.10", features = ["env", "toml"] }
 log = "0.4.20"
 serde = { version = "1.0.188", features = ["derive"] }
-teloxide = "0.12.2"
+teloxide = { version = "0.12.2", features = ["macros"] }
 tokio = { version = "1.32.0", features = ["rt-multi-thread", "macros"] }
 url = { version = "2.4.1", features = ["serde"] }
 uuid = { version = "1.4.1", features = ["serde", "v4"] }

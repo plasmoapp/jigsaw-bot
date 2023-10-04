@@ -18,6 +18,8 @@ pub enum SocketError {
     UnsupportedProtocol(Box<str>),
     #[error("Invalid Credentials")]
     InvalidCredentials,
+    #[error("Credentials Expired")]
+    CredentialsExpired,
     #[error("Invalid request. Expected: {0}")]
     InvalidRequest(Box<str>),
     #[error("Invalid Header Data: {0}")]

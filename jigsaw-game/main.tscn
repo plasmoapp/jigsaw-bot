@@ -1,25 +1,30 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=7 format=2]
 
-[ext_resource path="res://Main.gd" type="Script" id=1]
+[ext_resource path="res://scripts/Main.gd" type="Script" id=1]
 [ext_resource path="res://scripts/DroppableArea.gd" type="Script" id=2]
 [ext_resource path="res://TilesContainer.gd" type="Script" id=3]
+[ext_resource path="res://scripts/GameContainer.gd" type="Script" id=4]
 
-[node name="Node" type="Node"]
+[sub_resource type="Theme" id=1]
+
+[sub_resource type="Theme" id=2]
+/colors/font_color = Color( 0.517647, 0.247059, 0.247059, 1 )
+
+[node name="Main" type="Node"]
 script = ExtResource( 1 )
-puzzle_uuid = "050fab02-0699-40e5-aa11-cc840ed2c53b"
+puzzle_uuid = "aaaee591-117a-4b48-a09f-96646055e04e"
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="VSplitContainer" type="VSplitContainer" parent="CanvasLayer"]
+[node name="GameContainer" type="Container" parent="CanvasLayer"]
+unique_name_in_owner = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 1
-dragger_visibility = 2
-__meta__ = {
-"_edit_use_anchors_": true
-}
+theme = SubResource( 1 )
+script = ExtResource( 4 )
 
-[node name="DroppableArea" type="Control" parent="CanvasLayer/VSplitContainer"]
+[node name="DroppableArea" type="Control" parent="CanvasLayer/GameContainer"]
 unique_name_in_owner = true
 margin_right = 1024.0
 margin_bottom = 600.0
@@ -27,7 +32,7 @@ mouse_filter = 1
 size_flags_vertical = 3
 script = ExtResource( 2 )
 
-[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/VSplitContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/GameContainer"]
 margin_top = 600.0
 margin_right = 1024.0
 margin_bottom = 600.0
@@ -35,12 +40,17 @@ mouse_filter = 1
 size_flags_vertical = 8
 scroll_vertical_enabled = false
 
-[node name="TilesContainer" type="HBoxContainer" parent="CanvasLayer/VSplitContainer/ScrollContainer"]
+[node name="TilesContainer" type="HBoxContainer" parent="CanvasLayer/GameContainer/ScrollContainer"]
 unique_name_in_owner = true
 margin_right = 1024.0
 size_flags_horizontal = 3
 custom_constants/separation = 0
 script = ExtResource( 3 )
+
+[node name="Button" type="Button" parent="CanvasLayer/GameContainer"]
+margin_right = 12.0
+margin_bottom = 20.0
+theme = SubResource( 2 )
 
 [node name="Label" type="Label" parent="."]
 visible = false

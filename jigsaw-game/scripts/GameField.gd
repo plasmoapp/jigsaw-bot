@@ -6,7 +6,7 @@ export var puzzle_uuid: String
 
 export var original_tile_size: Vector2 = Vector2(80, 80)
 
-onready var global = get_node("/root/Global")
+onready var config: GameConfig = get_node("/root/Config")
 
 onready var http_image = get_node("%HttpImage")
 
@@ -18,7 +18,9 @@ var cell_map: Dictionary = {}
 
 func _ready():
 	http_image.connect("image_loaded", self, "_on_image_loaded")
-	http_image.url = "%s/assets/%s/source.jpeg" % [global.base_url, puzzle_uuid]
+	var url = "%s/assets/%s/source.webp" % [config.base_url, puzzle_uuid]
+	print(url)
+	http_image.url = url
 	http_image.load()
 	connect("resized", self, "_on_image_resized")
 	
@@ -47,7 +49,7 @@ func resize(image_size: Vector2):
 	$Control.margin_top = -rect_size.y / 2
 	$Control.margin_bottom = rect_size.y / 2
 	
-	global.emit_signal("tile_size_change", tile_size)
+	# global.emit_signal("tile_size_change", tile_size)
 
 
 func _on_image_loaded(image: ImageTexture): 
@@ -61,7 +63,7 @@ func _on_image_loaded(image: ImageTexture):
 			var instance = cell_scene.instance()
 			instance.index = index
 			instance.resize_tile_size(tile_size)
-			global.connect("tile_size_change", instance, "resize_tile_size")
+			# global.connect("tile_size_change", instance, "resize_tile_size")
 			grid_container.add_child(instance)
 			cell_map[index.as_string()] = instance
 	emit_signal("grid_initialized", cell_map)

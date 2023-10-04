@@ -1,11 +1,9 @@
 extends Node
 
-class_name GlobalState
+class_name GameConfig
 
-signal tile_size_change(tile_size)
-
-var test_url = "localhost:3000"
-var prod_url = "d95b-176-36-229-75.ngrok-free.app"
+export var test_url: String = "localhost:3000"
+export var prod_url: String = "5d8b-176-36-229-75.ngrok-free.app"
 
 var base_url = "https://%s" % prod_url
 var base_ws_url = "wss://%s" % prod_url

@@ -1,13 +1,6 @@
-
-
 use eyre::Report;
-use jigsaw_common::model::{
-    puzzle::{JigsawPuzzle},
-    request::generate_puzzle::GeneratePuzzleRequest,
-};
+use jigsaw_common::model::{puzzle::JigsawPuzzle, request::generate_puzzle::GeneratePuzzleRequest};
 use path_macro::path;
-
-
 
 use crate::{
     config::Config,
@@ -22,15 +15,6 @@ pub struct JigsawGenerator {
 
 impl JigsawGenerator {
     pub fn new(config: Config, storage: JigsawStorage) -> Self {
-        // let redis_connection = redis::Client::open(config.redis_url.as_str())?
-        //     .get_multiplexed_tokio_connection()
-        //     .await?;
-
-        // let storage = JigsawStorage::new(
-        //     JigsawFsImageStorage::new(config.complete_storage_path.as_path()),
-        //     JigsawRedisStateStorage {},
-        // );
-
         Self { config, storage }
     }
 
@@ -46,33 +30,4 @@ impl JigsawGenerator {
 
         Ok(puzzle)
     }
-
-    // // pub async fn handle_message(&mut self, msg: Msg) {
-    //     // let result = self.generate_from_request(&request).await;
-
-    //     let puzzle_uuid = match result {
-    //         Ok(puzzle) => {
-    //             debug!(
-    //                 "Sucessfully generated puzzle {} for request {}",
-    //                 puzzle.uuid, request.uuid
-    //             );
-    //             Some(puzzle.uuid)
-    //         }
-    //         Err(error) => {
-    //             error!(
-    //                 "Error when generating puzzle for request {}: {}",
-    //                 request.uuid, error
-    //             );
-    //             None
-    //         }
-    //     };
-
-    //     let event = PuzzleGeneratedEvent::new(request.uuid, puzzle_uuid);
-    //     let Ok(message) = rmp_serde::to_vec(&event) else { return };
-
-    //     let result = self
-    //         .redis_connection
-    //         .publish("event:puzzle_generated", message)
-    //         .await;
-    // }
 }

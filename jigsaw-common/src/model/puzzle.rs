@@ -8,11 +8,31 @@ use uuid::Uuid;
 pub struct JigsawPuzzle {
     pub uuid: Uuid,
     pub tile_map: HashMap<Uuid, JigsawTile>,
+    pub meta: JigsawMeta,
 }
 
 impl JigsawPuzzle {
-    pub fn new(uuid: Uuid, tile_map: HashMap<Uuid, JigsawTile>) -> Self {
-        Self { uuid, tile_map }
+    pub fn new(uuid: Uuid, tile_map: HashMap<Uuid, JigsawTile>, meta: JigsawMeta) -> Self {
+        Self {
+            uuid,
+            tile_map,
+            meta,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct JigsawMeta {
+    tile_size_px: u32,
+    image_dimensions_px: (u32, u32),
+}
+
+impl JigsawMeta {
+    pub fn new(tile_size_px: u32, image_dimensions_px: (u32, u32)) -> Self {
+        Self {
+            tile_size_px,
+            image_dimensions_px,
+        }
     }
 }
 

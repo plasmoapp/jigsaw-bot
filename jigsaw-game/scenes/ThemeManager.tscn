@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://scripts/ThemeManager.gd" type="Script" id=1]
+
+[node name="ThemeManager" type="Node"]
+script = ExtResource( 1 )
+bg_color = Color( 0.247059, 0.247059, 0.247059, 1 )
