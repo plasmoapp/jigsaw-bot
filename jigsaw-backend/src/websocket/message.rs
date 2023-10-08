@@ -3,9 +3,15 @@ use std::collections::HashMap;
 use axum::extract::ws::Message;
 use jigsaw_common::model::puzzle::{JigsawIndex, JigsawMeta, PublicJigsawTile};
 use serde::{Deserialize, Serialize};
+use tokio::sync::broadcast::Sender;
 use uuid::Uuid;
 
-use crate::model::user::{User, UserId};
+use crate::model::user::{User, UserData, UserId};
+
+use eyre::Report;
+
+// Message is Server to Client
+// Request is Client to Server
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -14,6 +20,8 @@ pub enum WsMessage {
     Initial {
         meta: JigsawMeta,
         state: HashMap<Uuid, PublicJigsawTile>,
+        users: HashMap<UserId, UserData>,
+        scores: HashMap<UserId, u64>,
     },
     Placed {
         user: UserId,
@@ -30,6 +38,44 @@ pub enum WsMessage {
         user: UserId,
         message: String,
     },
+}
+
+impl WsMessage {
+    pub fn initial(
+        meta: JigsawMeta,
+        state: HashMap<Uuid, PublicJigsawTile>,
+        users: HashMap<UserId, UserData>,
+        scores: HashMap<UserId, u64>,
+    ) -> Self {
+        Self::Initial {
+            meta,
+            state,
+            users,
+            scores,
+        }
+    }
+
+    pub fn placed(user: UserId, tile_uuid: Uuid, index: JigsawIndex) -> Self {
+        Self::Placed {
+            user,
+            tile_uuid,
+            index,
+        }
+    }
+
+    pub fn join(user: User) -> Self {
+        Self::Join { user }
+    }
+
+    pub fn leave(user: UserId) -> Self {
+        Self::Leave { user }
+    }
+
+    pub fn send_ch(self, sender: &Sender<Message>) -> Result<(), Report> {
+        let message: Message = self.try_into()?;
+        sender.send(message)?;
+        Ok(())
+    }
 }
 
 #[derive(Serialize, Deserialize)]

@@ -3,9 +3,8 @@
 [ext_resource path="res://components/puzzle_piece/puzzle_piece.gd" type="Script" id=1]
 [ext_resource path="res://components/http_image/HttpImage.tscn" type="PackedScene" id=2]
 
-[node name="PuzzlePiece" type="Control"]
-margin_right = 40.0
-margin_bottom = 40.0
+[node name="PuzzlePiece" type="Control" groups=["puzzle_piece"]]
+mouse_filter = 1
 script = ExtResource( 1 )
 
 [node name="HttpImage" parent="." instance=ExtResource( 2 )]
@@ -17,5 +16,5 @@ margin_left = 0.0
 margin_top = 0.0
 margin_right = 0.0
 margin_bottom = 0.0
-url = "https://i.natgeofe.com/n/548467d8-c5f1-4551-9f58-6817a8d2c45e/NationalGeographic_2572187_square.jpg"
-autoload = true
+mouse_filter = 2
+expand = true

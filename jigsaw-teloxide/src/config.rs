@@ -21,13 +21,13 @@ impl Config {
         .expect("Url should always be valid")
     }
 
-    pub fn get_puzzle_source_url(&self, puzzle_uuid: &Uuid) -> Url {
+    pub fn get_puzzle_preview_url(&self, puzzle_uuid: &Uuid) -> Url {
         let mut url = self.web_app_url.clone();
         url.path_segments_mut()
             .expect("Should be always valid")
             .push("assets")
             .push(&puzzle_uuid.to_string())
-            .push("source.jpeg");
+            .push("preview.jpeg");
         url
     }
 }

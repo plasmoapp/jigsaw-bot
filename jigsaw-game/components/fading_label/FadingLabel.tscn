@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://components/fading_label/fading_label.gd" type="Script" id=1]
+
+[node name="FadingLabel" type="Label"]
+text = "Test"
+script = ExtResource( 1 )
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
+[node name="Tween" type="Tween" parent="."]

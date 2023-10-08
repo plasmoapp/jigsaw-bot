@@ -63,11 +63,17 @@ impl JigsawImageStorage for JigsawFsImageStorage {
 
         let puzzle_source_path = path!(&puzzle_dir / "source.webp");
 
+        let puzzle_preview_path = path!(&puzzle_dir / "preview.jpeg");
+
         let puzzle_dir_ref = &puzzle_dir;
 
         puzzle
             .puzzle_source
             .save_with_format(puzzle_source_path, ImageFormat::WebP)?;
+
+        puzzle
+            .puzzle_source
+            .save_with_format(puzzle_preview_path, ImageFormat::Jpeg)?;
 
         stream::iter(&puzzle.tile_vec)
             .then(|tile| async move {

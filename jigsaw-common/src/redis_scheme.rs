@@ -17,6 +17,16 @@ impl RedisScheme {
         format!("request_message_data:{request_uuid}")
     }
 
+    pub fn jigsaw_puzzle_score(puzzle_uuid: &Uuid) -> String {
+        format!("jigsaw_puzzle_score:{puzzle_uuid}")
+    }
+
+    pub const JIGSAW_USER_DATA: &'static str = "jigsaw_user_data";
+
+    // pub fn jigsaw_user_data(user_id: u64) -> String {
+    //     format!("jigsaw_user_data:{user_id}")
+    // }
+
     // PubSub Request
 
     pub const REQUEST_GENERATE_PUZZLE: &'static str = "request:generate_puzzle";

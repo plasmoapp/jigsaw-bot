@@ -9,7 +9,7 @@ onready var droppable_area := get_node("%DroppableArea")
 onready var tile_container := get_node("%TilesContainer")
 onready var game_container := get_node("%GameContainer")
 
-onready var config: GameConfig = get_node("/root/Config")
+# onready var config := get_node("/root/Config")
 
 var client = WebSocketClient.new()
 
@@ -22,31 +22,31 @@ func _process(delta):
 
 func _ready():
 
-	client.connect("connection_closed", self, "_closed")
-	client.connect("connection_error", self, "_closed")
-	client.connect("connection_established", self, "_connected")
-	client.connect("data_received", self, "_on_data")
+	# client.connect("connection_closed", self, "_closed")
+	# client.connect("connection_error", self, "_closed")
+	# client.connect("connection_established", self, "_connected")
+	# client.connect("data_received", self, "_on_data")
 	
 	if OS.has_feature('JavaScript'):
 		puzzle_uuid = JavaScript.eval("window.Telegram.WebApp.initDataUnsafe.start_param", true)
 		# puzzle_uuid = JavaScript.eval("(new URLSearchParams(window.location.search)).get('puzzle')")
 		print("Got puzzle uuid: %s" % puzzle_uuid)
 	
-	var url = "%s/api/puzzle/%s/websocket" % [config.base_ws_url, puzzle_uuid]
+	# var url = "%s/api/puzzle/%s/websocket" % [config.base_ws_url, puzzle_uuid]
 	
-	client.set_verify_ssl_enabled(true)
+	# client.set_verify_ssl_enabled(true)
 	
-	var protocols := []
-	
-	if OS.has_feature("editor"):
-		protocols.append("jigsaw-not-secure")
-	else:
-		protocols.append("jigsaw-telegram-auth")
-	
-	var websocket_error = client.connect_to_url(url, protocols)
-	
-	if websocket_error != OK:
-		push_error("Unable to connect to websocket")
+#	var protocols := []
+#
+#	if OS.has_feature("editor"):
+#		protocols.append("jigsaw-not-secure")
+#	else:
+#		protocols.append("jigsaw-telegram-auth")
+#
+#	var websocket_error = client.connect_to_url(url, protocols)
+#
+#	if websocket_error != OK:
+#		push_error("Unable to connect to websocket")
 		
 		
 func _closed(was_clean = false):

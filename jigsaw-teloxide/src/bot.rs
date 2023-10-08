@@ -2,9 +2,10 @@ use std::{path::PathBuf, sync::Arc};
 
 use dptree::case;
 use jigsaw_common::{
-    model::request::generate_puzzle::GeneratePuzzleRequest, redis_scheme::RedisScheme,
+    model::{puzzle::JigsawMeta, request::generate_puzzle::GeneratePuzzleRequest},
+    redis_scheme::RedisScheme,
 };
-use redis::aio::MultiplexedConnection;
+use redis::{aio::MultiplexedConnection, AsyncCommands};
 use teloxide::{
     dispatching::{UpdateFilterExt, UpdateHandler},
     filter_command,
@@ -16,11 +17,12 @@ use teloxide::{
     respond,
     types::{
         InlineKeyboardButton, InlineKeyboardMarkup, InlineQuery, InlineQueryResult,
-        InlineQueryResultArticle,
-        InputMessageContent, InputMessageContentText, Message, Update,
+        InlineQueryResultArticle, InlineQueryResultPhoto, InputMessageContent,
+        InputMessageContentText, Message, Update,
     },
     Bot,
 };
+use tokio::sync::RwLockMappedWriteGuard;
 use uuid::Uuid;
 
 use crate::config::Config;
@@ -135,25 +137,51 @@ async fn start_handler(bot: Bot, message: Message) -> Result<(), Report> {
     Ok(())
 }
 
-async fn inline_handler(bot: Bot, query: InlineQuery, config: Arc<Config>) -> Result<(), Report> {
-    let puzzle_uuid = Uuid::parse_str(&query.query)?;
+async fn inline_handler(
+    bot: Bot,
+    query: InlineQuery,
+    config: Arc<Config>,
+    mut redis: MultiplexedConnection,
+) -> Result<(), Report> {
+    let Ok(puzzle_uuid) = Uuid::parse_str(&query.query) else {
+        bot.answer_inline_query(&query.id, []).await?;
+        return Ok(());
+    };
+
+    let raw_meta = redis
+        .get::<'_, _, Option<Vec<u8>>>(RedisScheme::jigsaw_puzzle_meta(&puzzle_uuid))
+        .await?;
+
+    let meta: JigsawMeta = match raw_meta {
+        Some(raw_meta) => rmp_serde::from_slice(&raw_meta)?,
+        None => {
+            bot.answer_inline_query(&query.id, []).await?;
+            return Ok(());
+        }
+    };
 
     let button = InlineKeyboardButton::url("Play", config.get_puzzle_url(&puzzle_uuid));
 
-    let image = config.get_puzzle_source_url(&puzzle_uuid);
+    let image = config.get_puzzle_preview_url(&puzzle_uuid);
 
     let article = InlineQueryResultArticle::new(
-        "share".to_string(),
-        "Share the puzzle",
-        InputMessageContent::Text(InputMessageContentText::new(
-            "Solve a Jigsaw Puzzle together!",
-        )),
-    )
-    .thumb_url(image)
-    .description("Click here to share")
-    .reply_markup(InlineKeyboardMarkup::new([[button]]));
+        "dummy".to_string(),
+        "⬇️ ⬇️ ⬇️",
+        InputMessageContent::Text(InputMessageContentText::new("Jigsaw Puzzle Bot by @kpids")),
+    );
 
-    let results = [InlineQueryResult::Article(article)];
+    let photo = InlineQueryResultPhoto::new("share", image.clone(), image.clone())
+        .photo_width(meta.image_dimensions_px.0 as i32)
+        .photo_height(meta.image_dimensions_px.1 as i32)
+        .title("Share puzzle")
+        .description("Click here to share")
+        .caption("Solve a Jigsaw Puzzle together!")
+        .reply_markup(InlineKeyboardMarkup::new([[button]]));
+
+    let results = [
+        InlineQueryResult::Article(article),
+        InlineQueryResult::Photo(photo),
+    ];
 
     bot.answer_inline_query(&query.id, results).await?;
 

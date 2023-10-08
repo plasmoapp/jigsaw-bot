@@ -9,10 +9,15 @@
 config_version=4
 
 _global_script_classes=[ {
-"base": "Node",
-"class": "GameConfig",
+"base": "Label",
+"class": "FadingLabel",
 "language": "GDScript",
-"path": "res://global/config/config.gd"
+"path": "res://components/fading_label/fading_label.gd"
+}, {
+"base": "Control",
+"class": "Game",
+"language": "GDScript",
+"path": "res://components/game/game.gd"
 }, {
 "base": "Container",
 "class": "GameContainer",
@@ -32,20 +37,39 @@ _global_script_classes=[ {
 "base": "Control",
 "class": "PuzzleGridCell",
 "language": "GDScript",
-"path": "res://_old/scripts/PuzzleGridCell.gd"
+"path": "res://components/puzzle_grid_cell/puzzle_grid_cell.gd"
+}, {
+"base": "Object",
+"class": "PuzzleMeta",
+"language": "GDScript",
+"path": "res://common/puzzle_meta.gd"
+}, {
+"base": "Control",
+"class": "PuzzlePiece",
+"language": "GDScript",
+"path": "res://components/puzzle_piece/puzzle_piece.gd"
 }, {
 "base": "Object",
 "class": "Vector2Int",
 "language": "GDScript",
 "path": "res://common/vec_2_int.gd"
+}, {
+"base": "Node",
+"class": "WebSocketManager",
+"language": "GDScript",
+"path": "res://components/web_socket_client/web_socket_manager.gd"
 } ]
 _global_script_class_icons={
-"GameConfig": "",
+"FadingLabel": "",
+"Game": "",
 "GameContainer": "",
 "HttpImage": "",
 "JigsawTile": "",
 "PuzzleGridCell": "",
-"Vector2Int": ""
+"PuzzleMeta": "",
+"PuzzlePiece": "",
+"Vector2Int": "",
+"WebSocketManager": ""
 }
 
 [application]
@@ -53,11 +77,21 @@ _global_script_class_icons={
 config/name="Jigsaw Puzzle"
 run/main_scene="res://scenes/main/Main.tscn"
 boot_splash/bg_color=Color( 0.141176, 0.141176, 0.141176, 1 )
+config/icon="res://icon.png"
 
 [autoload]
 
-ThemeManager="*res://global/theme_manager/ThemeManager.tscn"
 Config="*res://global/config/Config.tscn"
+ThemeManager="*res://global/theme_manager/ThemeManager.tscn"
+Events="*res://global/events/Events.tscn"
+
+[display]
+
+window/size/width=1440
+window/size/height=920
+window/dpi/allow_hidpi=true
+window/handheld/orientation="portrait"
+window/stretch/shrink=2.0
 
 [gui]
 
@@ -67,7 +101,7 @@ common/drop_mouse_on_gui_input_disabled=true
 
 Drag={
 "deadzone": 0.5,
-"events": [ Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"button_mask":0,"position":Vector2( 0, 0 ),"global_position":Vector2( 0, 0 ),"factor":1.0,"button_index":1,"pressed":false,"doubleclick":false,"script":null)
+"events": [ Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"button_mask":0,"position":Vector2( 0, 0 ),"global_position":Vector2( 0, 0 ),"factor":1.0,"button_index":1,"canceled":false,"pressed":false,"doubleclick":false,"script":null)
  ]
 }
 
@@ -80,4 +114,5 @@ common/enable_pause_aware_picking=true
 quality/driver/driver_name="GLES2"
 vram_compression/import_etc=true
 vram_compression/import_etc2=false
+quality/filters/use_nearest_mipmap_filter=true
 environment/default_environment="res://default_env.tres"

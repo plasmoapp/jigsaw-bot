@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://_old/scripts/PuzzleGridCell.gd" type="Script" id=1]
+[ext_resource path="res://components/puzzle_grid_cell/puzzle_grid_cell.gd" type="Script" id=1]
 
 [node name="PuzzleGridCell" type="Control"]
 margin_right = 40.0
@@ -21,3 +21,5 @@ border_color = Color( 0.415686, 0.415686, 0.415686, 1 )
 visible = false
 margin_right = 40.0
 margin_bottom = 14.0
+
+[node name="Tween" type="Tween" parent="."]

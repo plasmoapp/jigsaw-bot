@@ -7,6 +7,7 @@ signal image_loaded(image_texture)
 export var url: String
 export var autoload: bool = false
 
+
 func _ready():
 	$HTTPRequest.connect("request_completed", self, "_on_request_completed")
 	if autoload:

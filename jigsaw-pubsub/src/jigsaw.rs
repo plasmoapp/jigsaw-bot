@@ -11,7 +11,7 @@ use jigsaw_common::{
 
 use crate::jigsaw_connections::PieceConnections;
 
-const BIGGER_SIDE_SIZE_PX: u32 = 640;
+const BIGGER_SIDE_SIZE_PX: u32 = 1920;
 
 const TILES_PER_BIGGER_SIDE: u32 = 8;
 

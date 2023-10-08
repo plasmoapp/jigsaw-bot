@@ -23,8 +23,8 @@ impl JigsawPuzzle {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct JigsawMeta {
-    tile_size_px: u32,
-    image_dimensions_px: (u32, u32),
+    pub tile_size_px: u32,
+    pub image_dimensions_px: (u32, u32),
 }
 
 impl JigsawMeta {

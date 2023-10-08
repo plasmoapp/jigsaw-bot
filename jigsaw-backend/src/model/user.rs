@@ -11,9 +11,9 @@ impl User {
     }
 }
 
-#[derive(Shrinkwrap, Serialize, Deserialize, Clone, Copy)]
+#[derive(Shrinkwrap, Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Hash)]
 #[serde(transparent)]
-pub struct UserId(u64);
+pub struct UserId(pub u64);
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct UserData {

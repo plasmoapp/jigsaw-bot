@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=2]
-
-[ext_resource path="res://components/web_socket_client/web_socket_client.gd" type="Script" id=1]
-
-[node name="WebSocketClient" type="Node"]
-script = ExtResource( 1 )
