@@ -20,7 +20,7 @@ use crate::{
 
 #[tokio::main]
 async fn main() -> Result<(), Report> {
-    dotenvy::dotenv()?;
+    _ = dotenvy::dotenv();
     tracing_subscriber::fmt::init();
 
     let state = AppState::new().await?;

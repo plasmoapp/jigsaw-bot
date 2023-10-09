@@ -30,7 +30,7 @@ use crate::config::Config;
 
 #[tokio::main]
 async fn main() -> Result<(), Report> {
-    dotenvy::dotenv()?;
+    _ = dotenvy::dotenv();
 
     env_logger::init();
 

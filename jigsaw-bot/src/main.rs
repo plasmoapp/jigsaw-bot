@@ -14,7 +14,7 @@ use crate::{bot::bot_main, pubsub::pubsub_main};
 
 #[tokio::main]
 async fn main() -> Result<(), Report> {
-    dotenvy::dotenv()?;
+    _ = dotenvy::dotenv();
     env_logger::init();
 
     let config = Arc::new(default_extract_config::<Config>()?);

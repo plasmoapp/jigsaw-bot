@@ -1,0 +1,55 @@
+version: "3.x"
+
+volumes:
+  data-request: {}
+  data-complete: {}
+  redis: {}
+
+x-shared-environment: &shared-environment
+  environment:
+    CONFIG.REQUEST_STORAGE_PATH: /data/request
+    CONFIG.COMPLETE_STORAGE_PATH: /data/complete
+  volumes:
+    - data-request:/data/request
+    - data-complete:/data/complete
+
+services:
+  redis:
+    image: redis:latest
+    restart: always
+    environment:
+      - ALLOW_EMPTY_PASSWORD=true
+    volumes:
+      - redis:/data
+
+  bot:
+    depends_on: [ redis ]
+    build:
+      context: ./
+      dockerfile: jigsaw-bot/Dockerfile
+    env_file: [ .env ]
+    <<: *shared-environment
+
+  generator:
+    depends_on: [ redis ]
+    build:
+      context: ./
+      dockerfile: jigsaw-generator/Dockerfile
+    env_file: [ .env ]
+    <<: *shared-environment
+    volumes:
+      - data-request:/data/request
+      - data-complete:/data/complete
+
+  backend:
+    depends_on: [ redis ]
+    build:
+      context: ./
+      dockerfile: ./jigsaw-backend/Dockerfile
+    env_file: [ .env ]
+    <<: *shared-environment
+    volumes:
+      - data-request:/data/request
+      - data-complete:/data/complete
+    ports:
+      - "3030:3030"
