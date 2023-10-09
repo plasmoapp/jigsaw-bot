@@ -10,6 +10,7 @@ x-shared-environment: &shared-environment
     CONFIG.REQUEST_STORAGE_PATH: /data/request
     CONFIG.COMPLETE_STORAGE_PATH: /data/complete
     CONFIG.REDIS_URL: redis://redis
+    CONFIG.BIND_ADDRESS: 0.0.0.0:3030
   volumes:
     - data-request:/data/request
     - data-complete:/data/complete
