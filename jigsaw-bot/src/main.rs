@@ -23,7 +23,7 @@ async fn main() -> Result<(), Report> {
         .get_multiplexed_tokio_connection()
         .await?;
 
-    let bot = Bot::from_env();
+    let bot = Bot::new(&config.bot_token);
 
     let mut redis_pubsub = redis::Client::open(config.redis_url.as_str())?
         .get_tokio_connection()

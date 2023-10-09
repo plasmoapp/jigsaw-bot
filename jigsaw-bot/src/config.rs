@@ -5,6 +5,7 @@ use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
+    pub bot_token: String,
     pub web_app_url: Url,
     pub bot_name: String,
     pub web_app_name: String,

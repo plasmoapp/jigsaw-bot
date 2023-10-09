@@ -1073,6 +1073,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "jigsaw-bot"
+version = "0.1.0"
+dependencies = [
+ "dotenvy",
+ "dptree",
+ "env_logger",
+ "eyre",
+ "futures",
+ "jigsaw-common",
+ "log",
+ "redis",
+ "rmp-serde",
+ "serde",
+ "teloxide",
+ "tokio",
+ "url",
+ "uuid",
+]
+
+[[package]]
 name = "jigsaw-common"
 version = "0.1.0"
 dependencies = [
@@ -1104,26 +1124,6 @@ dependencies = [
  "serde_json",
  "shrinkwraprs",
  "tiny-skia",
- "tokio",
- "url",
- "uuid",
-]
-
-[[package]]
-name = "jigsaw-teloxide"
-version = "0.1.0"
-dependencies = [
- "dotenvy",
- "dptree",
- "env_logger",
- "eyre",
- "futures",
- "jigsaw-common",
- "log",
- "redis",
- "rmp-serde",
- "serde",
- "teloxide",
  "tokio",
  "url",
  "uuid",
