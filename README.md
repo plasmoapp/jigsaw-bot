@@ -66,7 +66,7 @@ Here is also a list of specific features you might want to use in your project:
 
 ### Sync Godot Theme with Telegram Theme 
 
-### 4
+### Access start
 
 ## How to setup a developer enviroment
 
@@ -140,21 +140,32 @@ CONFIG.BOT_TOKEN=<bot_token>
 docker-compose up --build -d
 ```
 
-You can then restart specific containers after you make changes
-
 ```bash
+# View status of the containers
+docker-compose ps -a
 
+# View logs
+docker-compose logs -f
 
+# Restart a specific container
+docker-compose restart backend
+docker-compose restart bot
+docker-compose restart generator
+
+# Stop everything
+docker-compose stop
 ```
 
-**Keep in mind:** 
+### Keep in mind
 
-[jigsaw-game]() project is built inside of the [jigsaw-backend]() Dockerfile. After you've made changed to the [jigsaw-game]() project – you need to restart the [jigsaw-backend]() container
+[jigsaw-game](./jigsaw-game) project is built inside of the [jigsaw-backend](./jigsaw-backend) Dockerfile
 
-App runs on the port 3030 by default. You can change it inside of the `docker-compose.yaml`
+After you've made changed to the [jigsaw-game](./jigsaw-game) project – you need to restart the `backend` container
+
+App runs on the port `3030` by default. You can change the port inside of the `docker-compose.yaml`
  
 ## Planned features
 
-I've made some issues of things that I wanted to implement but didn't have time because of the contest deadline
+I've made some issues of features that I wanted to implement but didn't have time because of the contest deadline
 
 Probably will work on them eventually but I also welcome contributions :)
