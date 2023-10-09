@@ -10,6 +10,7 @@ use jigsaw_common::{
 };
 
 use crate::jigsaw_connections::PieceConnections;
+use crate::mask::MaskApply;
 
 const BIGGER_SIDE_SIZE_PX: u32 = 1920;
 
@@ -96,79 +97,49 @@ impl RawJigsawPuzzle {
 
         let new_image = image.resize_to_fill(new_width, new_height, FilterType::Lanczos3);
 
-        let connections = PieceConnections::generate_connections_for_size(
-            new_width,
-            new_height,
-            TILE_SIZE_PX,
-            None,
-        );
+        let new_image_with_padding = {
+            let mut container_image = DynamicImage::new_rgba8(
+                new_width + TILE_SIZE_PX,
+                new_height + TILE_SIZE_PX,
+            );
+
+            container_image.copy_from(&new_image, TILE_PADDING_PX, TILE_PADDING_PX)?;
+            container_image
+        };
 
         let tiles_x = (new_width / TILE_SIZE_PX) as usize;
         let tiles_y = (new_height / TILE_SIZE_PX) as usize;
 
-        let tile_vec = (0..new_width)
+        let connections = PieceConnections::generate_connections_for_size(
+            tiles_x,
+            tiles_y,
+            None,
+        );
+
+        let tile_vec = (TILE_PADDING_PX..(new_width + TILE_PADDING_PX))
             .into_par_iter()
             .step_by(TILE_SIZE_PX as usize)
             .flat_map(|corner_x| {
-                (0..new_height)
+                (TILE_PADDING_PX..(new_height + TILE_PADDING_PX))
                     .into_par_iter()
                     .step_by(TILE_SIZE_PX as usize)
                     .map(|corner_y| {
-                        let x = (corner_x / TILE_SIZE_PX) as usize;
-                        let y = (corner_y / TILE_SIZE_PX) as usize;
+                        let index = JigsawIndex::new(
+                            (corner_x - TILE_PADDING_PX) / TILE_SIZE_PX,
+                            (corner_y - TILE_PADDING_PX) / TILE_SIZE_PX
+                        );
 
-                        let (crop_x, crop_width) = {
-                            if x == 0 {
-                                if tiles_x > 1 {
-                                    (0, TILE_SIZE_PX + TILE_PADDING_PX)
-                                } else {
-                                    (0, TILE_SIZE_PX)
-                                }
-                            } else if x == tiles_x - 1 {
-                                (TILE_PADDING_PX, TILE_PADDING_PX + TILE_SIZE_PX)
-                            } else {
-                                (
-                                    TILE_PADDING_PX,
-                                    TILE_PADDING_PX + TILE_SIZE_PX + TILE_PADDING_PX,
-                                )
-                            }
-                        };
-                        let (crop_y, crop_height) = {
-                            if y == 0 {
-                                if tiles_y > 1 {
-                                    (0, TILE_SIZE_PX + TILE_PADDING_PX)
-                                } else {
-                                    (0, TILE_SIZE_PX)
-                                }
-                            } else if y == tiles_y - 1 {
-                                (TILE_PADDING_PX, TILE_PADDING_PX + TILE_SIZE_PX)
-                            } else {
-                                (
-                                    TILE_PADDING_PX,
-                                    TILE_PADDING_PX + TILE_SIZE_PX + TILE_PADDING_PX,
-                                )
-                            }
-                        };
+                        let x = index.x as usize;
+                        let y = index.y as usize;
 
                         let connection = connections[y][x].clone();
 
-                        let index =
-                            JigsawIndex::new(corner_x / TILE_SIZE_PX, corner_y / TILE_SIZE_PX);
-                        let crop = new_image.crop_imm(
-                            corner_x - crop_x,
-                            corner_y - crop_y,
-                            crop_width,
-                            crop_height,
-                        );
-                        let mut container_image = DynamicImage::new_rgba8(
+                        let crop = new_image_with_padding.crop_imm(
+                            corner_x - TILE_PADDING_PX,
+                            corner_y - TILE_PADDING_PX,
                             TILE_WITH_PADDING_SIZE_PX,
                             TILE_WITH_PADDING_SIZE_PX,
                         );
-
-                        container_image
-                            .copy_from(&crop, TILE_PADDING_PX - crop_x, TILE_PADDING_PX - crop_y)
-                            .unwrap();
-                        let image_bytes = container_image.to_rgba8().to_vec();
 
                         let mask = connection.create_piece_mask(
                             TILE_WITH_PADDING_SIZE_PX,
@@ -176,23 +147,7 @@ impl RawJigsawPuzzle {
                             TILE_SIZE_PX,
                         );
 
-                        let mut pixmap = Pixmap::from_vec(
-                            image_bytes,
-                            IntSize::from_wh(TILE_WITH_PADDING_SIZE_PX, TILE_WITH_PADDING_SIZE_PX)
-                                .unwrap(),
-                        )
-                        .unwrap();
-
-                        pixmap.apply_mask(&mask);
-
-                        let final_image = DynamicImage::from(
-                            RgbaImage::from_raw(
-                                TILE_WITH_PADDING_SIZE_PX,
-                                TILE_WITH_PADDING_SIZE_PX,
-                                pixmap.data().to_vec(),
-                            )
-                            .unwrap(),
-                        );
+                        let final_image = mask.apply_to_image(&crop);
 
                         RawJigsawTile::new(index, final_image)
                     })
