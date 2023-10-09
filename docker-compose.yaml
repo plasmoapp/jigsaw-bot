@@ -9,6 +9,7 @@ x-shared-environment: &shared-environment
   environment:
     CONFIG.REQUEST_STORAGE_PATH: /data/request
     CONFIG.COMPLETE_STORAGE_PATH: /data/complete
+    CONFIG.REDIS_URL: redis://redis
   volumes:
     - data-request:/data/request
     - data-complete:/data/complete
