@@ -62,7 +62,6 @@ func send_message(message: String) -> int:
 
 
 func _on_data():
-	# Recieve a WebSocket message
 	var string = client.get_peer(1).get_packet().get_string_from_utf8()
 	# All messages are JSON encoded
 	var result = JSON.parse(string)

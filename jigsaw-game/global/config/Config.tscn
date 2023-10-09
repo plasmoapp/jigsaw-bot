@@ -8,4 +8,3 @@ __meta__ = {
 "_editor_description_": ""
 }
 test_url = "localhost:3000"
-prod_url = "8740-176-36-229-75.ngrok-free.app"
