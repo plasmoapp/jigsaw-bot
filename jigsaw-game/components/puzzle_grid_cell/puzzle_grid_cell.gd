@@ -9,9 +9,8 @@ var piece: PuzzlePiece = null
 onready var tile_container := $TileContainer
 onready var tween := $Tween
 
-func _ready():
+func _ready() -> void:
 	Events.connect("tile_size_change", self, "_on_tile_size_change")
-	$Label.text = index.as_string()
 
 
 func can_drop_data(position: Vector2, data: Object) -> bool:

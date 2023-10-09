@@ -43,14 +43,6 @@ func connect_with_puzzle_uuid(puzzle_uuid: String) -> void:
 		push_error("Unable to connect to websocket")
 
 
-func _closed(was_clean = false):
-	push_error("Closed, clean: %s" % was_clean)
-
-
-func send_message(message: String) -> int:
-	return client.get_peer(1).put_packet(message.to_utf8())
-
-
 func _connected(proto = ""):
 	if proto == "jigsaw-telegram-auth":
 		# With this protocol the server will expect the client to send
@@ -63,6 +55,10 @@ func _connected(proto = ""):
 		
 		if error != OK:
 			push_error("Error when sending a request: %s" % String(error))
+
+
+func send_message(message: String) -> int:
+	return client.get_peer(1).put_packet(message.to_utf8())
 
 
 func _on_data():
@@ -80,3 +76,7 @@ func _on_data():
 	# a message of a specific type and don't need to check it
 	# every time
 	emit_signal(message["type"], message)
+
+
+func _closed(was_clean = false):
+	push_error("Closed, clean: %s" % was_clean)

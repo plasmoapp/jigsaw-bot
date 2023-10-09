@@ -132,11 +132,14 @@ impl SocketHandler {
 
         tile_data.in_place = true;
 
-        redis
+        redis::pipe()
             .hset(&key, &field, rmp_serde::to_vec(&tile_data)?)
+            .zincr(RedisScheme::jigsaw_puzzle_score(puzzle_uuid), *user.0, 1)
+            .incr(RedisScheme::jigsaw_puzzle_score_total(puzzle_uuid), 1)
+            .query_async(redis)
             .await?;
 
-        let _ = WsMessage::placed(user.0, tile_uuid.to_owned(), index).send_ch(ch_sender);
+        WsMessage::placed(user.0, tile_uuid.to_owned(), index).send_ch(ch_sender)?;
 
         Ok(())
     }
@@ -203,7 +206,12 @@ impl SocketHandler {
 
         let (ch_receiver, ch_sender) = self.state.get_channel(&self.puzzle_uuid).await;
 
-        let _ = Self::set_user_data(&self.user, &self.puzzle_uuid, &mut self.state.redis).await;
+        if let Err(error) =
+            Self::set_user_data(&self.user, &self.puzzle_uuid, &mut self.state.redis).await
+        {
+            tracing::error!("Error while setting user data: {error}");
+            return;
+        }
 
         let initial_message =
             match Self::get_initial_data(&self.puzzle_uuid, &mut self.state.redis).await {

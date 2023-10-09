@@ -9,7 +9,7 @@
 [node name="Main" type="Node"]
 
 [node name="GameManager" parent="." instance=ExtResource( 4 )]
-puzzle_uuid = "b8140460-925d-4bc1-a031-6d1ba1905562"
+puzzle_uuid = "78f2f015-664b-48e7-9914-226ebefc02c4"
 web_socket_manager = NodePath("../WebSocketManager")
 game = NodePath("../Control/Game")
 status_label = NodePath("../Control/Header/FadingLabel")
@@ -22,11 +22,11 @@ anchor_bottom = 1.0
 theme = ExtResource( 6 )
 
 [node name="Game" parent="Control" instance=ExtResource( 3 )]
-margin_top = 40.0
+margin_top = 48.0
 
 [node name="Header" type="Control" parent="Control"]
 anchor_right = 1.0
-margin_bottom = 40.0
+margin_bottom = 48.0
 
 [node name="FadingLabel" parent="Control/Header" instance=ExtResource( 5 )]
 anchor_left = 0.5

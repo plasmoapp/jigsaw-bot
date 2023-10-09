@@ -5,27 +5,33 @@ pub struct RedisScheme;
 impl RedisScheme {
     // Keys
 
+    // HSET where field is tile_uuid and value is JigsawTile
     pub fn jigsaw_puzzle_state(puzzle_uuid: &Uuid) -> String {
         format!("jigsaw_puzzle_state:{puzzle_uuid}")
     }
 
+    // Value is JigsawMeta
     pub fn jigsaw_puzzle_meta(puzzle_uuid: &Uuid) -> String {
         format!("jigsaw_puzzle_meta:{puzzle_uuid}")
     }
 
+    //
     pub fn request_message_data(request_uuid: &Uuid) -> String {
         format!("request_message_data:{request_uuid}")
     }
 
+    // ZSET where field is u64 UserId
     pub fn jigsaw_puzzle_score(puzzle_uuid: &Uuid) -> String {
         format!("jigsaw_puzzle_score:{puzzle_uuid}")
     }
 
-    pub const JIGSAW_USER_DATA: &'static str = "jigsaw_user_data";
+    // Value is u64
+    pub fn jigsaw_puzzle_score_total(puzzle_uuid: &Uuid) -> String {
+        format!("jigsaw_puzzle_score_total:{puzzle_uuid}")
+    }
 
-    // pub fn jigsaw_user_data(user_id: u64) -> String {
-    //     format!("jigsaw_user_data:{user_id}")
-    // }
+    // HSET where field is u64 UserId and value is UserData
+    pub const JIGSAW_USER_DATA: &'static str = "jigsaw_user_data";
 
     // PubSub Request
 

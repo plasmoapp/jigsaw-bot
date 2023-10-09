@@ -1,3 +1,6 @@
+# This Node is used to tie everything together:
+# WebSocketManager, Game and also Label
+
 extends Node
 
 export var puzzle_uuid: String
@@ -21,6 +24,9 @@ func _ready() -> void:
 	
 	Events.connect("request_place", self, "_on_request_place")
 	
+	# Get puzzle_uuid from Telegram start_param
+	# It's okay to use initDataUnsafe because we autorize user on the WebSocket
+	# later anyway 
 	if OS.has_feature('JavaScript'):
 		puzzle_uuid = JavaScript.eval("window.Telegram.WebApp.initDataUnsafe.start_param", true)
 		print("Got puzzle uuid from Telegram: %s" % puzzle_uuid)

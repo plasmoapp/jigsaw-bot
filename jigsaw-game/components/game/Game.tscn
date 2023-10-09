@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://components/http_image/HttpImage.tscn" type="PackedScene" id=1]
 [ext_resource path="res://components/game/game.gd" type="Script" id=2]
 [ext_resource path="res://components/puzzle_piece/PuzzlePiece.tscn" type="PackedScene" id=3]
 [ext_resource path="res://components/puzzle_grid_cell/PuzzleGridCell.tscn" type="PackedScene" id=4]
+[ext_resource path="res://components/game/tray.gd" type="Script" id=5]
 
 [node name="Game" type="Control"]
 anchor_right = 1.0
@@ -40,7 +41,10 @@ custom_constants/hseparation = 0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
+mouse_filter = 1
+script = ExtResource( 5 )
 
 [node name="MarginContainer" type="MarginContainer" parent="Tray"]
+mouse_filter = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Tray/MarginContainer"]

@@ -21,7 +21,6 @@ func get_preview(position: Vector2) -> Control:
 	preview.add_child(duplicate)
 	preview.add_to_group("preview")
 	duplicate.rect_position = -0.5 * duplicate.rect_size
-	#duplicate.rect_position = -position
 	return preview
 
 func get_drag_data(position: Vector2):
@@ -29,6 +28,5 @@ func get_drag_data(position: Vector2):
 		return null
 	
 	set_drag_preview(get_preview(position))
-	#self.rect_position = -position
 	return self
 

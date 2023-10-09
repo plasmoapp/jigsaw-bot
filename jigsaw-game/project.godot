@@ -19,20 +19,10 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://components/game/game.gd"
 }, {
-"base": "Container",
-"class": "GameContainer",
-"language": "GDScript",
-"path": "res://_old/scripts/GameContainer.gd"
-}, {
 "base": "TextureRect",
 "class": "HttpImage",
 "language": "GDScript",
 "path": "res://components/http_image/http_image.gd"
-}, {
-"base": "Control",
-"class": "JigsawTile",
-"language": "GDScript",
-"path": "res://_old/scripts/Tile.gd"
 }, {
 "base": "Control",
 "class": "PuzzleGridCell",
@@ -62,9 +52,7 @@ _global_script_classes=[ {
 _global_script_class_icons={
 "FadingLabel": "",
 "Game": "",
-"GameContainer": "",
 "HttpImage": "",
-"JigsawTile": "",
 "PuzzleGridCell": "",
 "PuzzleMeta": "",
 "PuzzlePiece": "",
@@ -115,4 +103,3 @@ quality/driver/driver_name="GLES2"
 vram_compression/import_etc=true
 vram_compression/import_etc2=false
 quality/filters/use_nearest_mipmap_filter=true
-environment/default_environment="res://default_env.tres"
