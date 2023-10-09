@@ -68,19 +68,90 @@ Here is also a list of specific features you might want to use in your project:
 
 ### 4
 
-## How to run dev enviroment or deploy 
+## How to setup a developer enviroment
 
-### 1. Download Docker and optionally ngrok
+### 1. Download Docker
 
-### 2. Create a Telegram Bot and a Web App 
+Docker Compose will allow us to install dependencies and launch multiple processes with one simple command
 
-### 3. Create .env file
+Install Docker Engine: https://docs.docker.com/engine/install/#desktop
 
-### 4. Start the containers 
+### 2. Setup Ngrok 
 
-### Things to keep in mind
+You need a secure HTTP connection for a Telegram Web App. To test the app locally you can use ngrok 
+
+Download: https://ngrok.com/download
+
+Then use this command to open a tunnel
+
+```bash
+ngrok http 3030
+```
+
+Keep the URL that looks like this: `https://<something>-<something>.ngrok-free.app`
+
+### 3. Create a Telegram Bot and a Web App 
+
+Create a bot using [@BotFather](https://t.me/BotFather). Don't forget to copy and save the bot token as you will need it later
+
+```
+/newbot
+```
+
+Enable Inline Mode
+
+```
+/setinline
+```
+
+Create a Web App. Set URL to the one you got from ngrok. The app can have any name
+
+```
+/newapp
+```
+
+### 4. Clone the repo 
+
+```
+git clone https://github.com/plasmoapp/jigsaw-bot.git
+cd jigsaw-bot
+```
+
+### 5. Create .env file inside of the cloned repo 
+
+```bash
+touch .env
+```
+
+```env
+# URL of the Web App
+CONFIG.WEB_APP_URL=https://<something>-<something>.ngrok-free.app
+# Name of the bot. Like in @<bot_name> or t.me/<bot_name>
+CONFIG.BOT_NAME=jigsawpuzzlebot
+# Name of the Telegram Web App. Like in t.me/<bot_name>/<app_name>
+CONFIG.WEB_APP_NAME=game
+# Bot Token 
+CONFIG.BOT_TOKEN=<bot_token>
+```
+
+### 6. Start the containers 
+
+```bash
+docker-compose up --build -d
+```
+
+You can then restart specific containers after you make changes
+
+```bash
+
+
+```
+
+**Keep in mind:** 
 
 [jigsaw-game]() project is built inside of the [jigsaw-backend]() Dockerfile. After you've made changed to the [jigsaw-game]() project – you need to restart the [jigsaw-backend]() container
+
+App runs on the port 3030 by default. You can change it inside of the `docker-compose.yaml`
  
 ## Planned features
 
