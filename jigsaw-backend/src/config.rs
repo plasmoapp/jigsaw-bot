@@ -4,7 +4,7 @@ use url::Url;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
-    pub port: u16,
+    pub bind_address: String,
     pub redis_url: Url,
     pub complete_storage_path: PathBuf,
     pub bot_token: String,

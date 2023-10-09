@@ -12,6 +12,7 @@ use axum::{
 
 
 use std::{net::SocketAddr};
+use std::str::FromStr;
 use tower_http::services::{ServeDir};
 
 use crate::{
@@ -25,7 +26,7 @@ async fn main() -> Result<(), Report> {
 
     let state = AppState::new().await?;
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], state.config.port));
+    let addr = SocketAddr::from_str(state.config.bind_address.as_str())?;
 
     let serve_dir_assets = ServeDir::new(&state.config.complete_storage_path);
     let serve_dir_public = ServeDir::new("public").append_index_html_on_directories(true);
