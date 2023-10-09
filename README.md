@@ -4,7 +4,7 @@
 
 Turn any image into a Jigsaw Puzzle and solve it together with friends without leaving Telegram
 
-Made with [Rust](https://www.rust-lang.org/), [Godot](https://godotengine.org/) and [Redis](https://redis.io/)
+Made with [Rust](https://www.rust-lang.org/) 🚀, [Godot](https://godotengine.org/) and [Redis](https://redis.io/)
 
 Try it out now: [@jigsawpuzzlebot](https://t.me/jigsawpuzzlebot)
 
@@ -54,6 +54,118 @@ Try it out now: [@jigsawpuzzlebot](https://t.me/jigsawpuzzlebot)
 
 ---
 
-## How to deploy 
+## Documentation
 
+Most of the code has comments and is aproachable so if you're feeling courageous – clone the repo and jump straight into it
+
+Here is also a list of specific features you might want to use in your project:
+
+### Mini App authorization on WebSockets (Rust, Axum)
+
+### Custom HTML export template for Godot
+
+### Sync Godot Theme with Telegram Theme 
+
+### Access start
+
+## How to setup a developer enviroment
+
+### 1. Download Docker
+
+Docker Compose will allow us to install dependencies and launch multiple processes with one simple command
+
+Install Docker Engine: https://docs.docker.com/engine/install/#desktop
+
+### 2. Setup Ngrok 
+
+You need a secure HTTP connection for a Telegram Web App. To test the app locally you can use ngrok 
+
+Download: https://ngrok.com/download
+
+Then use this command to open a tunnel
+
+```bash
+ngrok http 3030
+```
+
+Keep the URL that looks like this: `https://<something>-<something>.ngrok-free.app`
+
+### 3. Create a Telegram Bot and a Web App 
+
+Create a bot using [@BotFather](https://t.me/BotFather). Don't forget to copy and save the bot token as you will need it later
+
+```
+/newbot
+```
+
+Enable Inline Mode
+
+```
+/setinline
+```
+
+Create a Web App. Set URL to the one you got from ngrok. The app can have any name
+
+```
+/newapp
+```
+
+### 4. Clone the repo 
+
+```
+git clone https://github.com/plasmoapp/jigsaw-bot.git
+cd jigsaw-bot
+```
+
+### 5. Create .env file inside of the cloned repo 
+
+```bash
+touch .env
+```
+
+```env
+# URL of the Web App
+CONFIG.WEB_APP_URL=https://<something>-<something>.ngrok-free.app
+# Name of the bot. Like in @<bot_name> or t.me/<bot_name>
+CONFIG.BOT_NAME=jigsawpuzzlebot
+# Name of the Telegram Web App. Like in t.me/<bot_name>/<app_name>
+CONFIG.WEB_APP_NAME=game
+# Bot Token 
+CONFIG.BOT_TOKEN=<bot_token>
+```
+
+### 6. Start the containers 
+
+```bash
+docker-compose up --build -d
+```
+
+```bash
+# View status of the containers
+docker-compose ps -a
+
+# View logs
+docker-compose logs -f
+
+# Restart a specific container
+docker-compose restart backend
+docker-compose restart bot
+docker-compose restart generator
+
+# Stop everything
+docker-compose stop
+```
+
+### Keep in mind
+
+[jigsaw-game](./jigsaw-game) project is built inside of the [jigsaw-backend](./jigsaw-backend) Dockerfile
+
+After you've made changed to the [jigsaw-game](./jigsaw-game) project – you need to restart the `backend` container
+
+App runs on the port `3030` by default. You can change the port inside of the `docker-compose.yaml`
+ 
 ## Planned features
+
+I've made some issues of features that I wanted to implement but didn't have time because of the contest deadline
+
+Probably will work on them eventually but I also welcome contributions :)
