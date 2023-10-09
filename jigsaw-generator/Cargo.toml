@@ -1,5 +1,5 @@
 [package]
-name = "jigsaw-pubsub"
+name = "jigsaw-generator"
 version = "0.1.0"
 edition = "2021"
 
@@ -19,7 +19,6 @@ shrinkwraprs = "0.3.0"
 tokio = { version = "1.32.0", features = ["fs", "rt-multi-thread", "sync", "macros"] }
 url = { version = "2.4.1", features = ["serde"] }
 uuid = { version = "1.4.1", features = ["serde", "v4"] }
-figment = { version = "0.10.10", features = ["env", "toml"] }
 rmp-serde = "1.1.2"
 log = "0.4.20"
 env_logger = "0.10.0"

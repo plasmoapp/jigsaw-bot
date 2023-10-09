@@ -30,6 +30,6 @@ pub enum SocketError {
     Axum(#[from] axum::Error),
     #[error("Json Error: {0}")]
     Json(#[from] serde_json::Error),
-    #[error("Failed to UTF8:")]
+    #[error("FromUTF8 Error:")]
     FromUTF8(#[from] FromUtf8Error),
 }

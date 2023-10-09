@@ -1,19 +1,16 @@
 pub mod bot;
 pub mod config;
-pub mod sub;
+pub mod pubsub;
 
 use std::sync::Arc;
 
 use config::Config;
-use jigsaw_common::{
-    redis_scheme::RedisScheme,
-    util::config::default_extract_config,
-};
+use jigsaw_common::{redis_scheme::RedisScheme, util::config::default_extract_config};
 
 use eyre::Report;
 use teloxide::Bot;
 
-use crate::{bot::bot_main, sub::pubsub_main};
+use crate::{bot::bot_main, pubsub::pubsub_main};
 
 #[tokio::main]
 async fn main() -> Result<(), Report> {

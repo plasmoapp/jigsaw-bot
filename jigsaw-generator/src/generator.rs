@@ -5,16 +5,24 @@ use path_macro::path;
 use crate::{
     config::Config,
     jigsaw::RawJigsawPuzzle,
-    storage::{JigsawImageStorage, JigsawStorage},
+    storage::{JigsawImageStorage, JigsawStateStorage, JigsawStorage},
 };
 
-pub struct JigsawGenerator {
+pub struct JigsawGenerator<I, S>
+where
+    I: JigsawImageStorage + Sync + Send,
+    S: JigsawStateStorage + Sync + Send,
+{
     pub config: Config,
-    pub storage: JigsawStorage,
+    pub storage: JigsawStorage<I, S>,
 }
 
-impl JigsawGenerator {
-    pub fn new(config: Config, storage: JigsawStorage) -> Self {
+impl<I, S> JigsawGenerator<I, S>
+where
+    I: JigsawImageStorage + Sync + Send,
+    S: JigsawStateStorage + Sync + Send,
+{
+    pub fn new(config: Config, storage: JigsawStorage<I, S>) -> Self {
         Self { config, storage }
     }
 

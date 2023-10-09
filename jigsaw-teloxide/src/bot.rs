@@ -1,4 +1,4 @@
-use std::{path::PathBuf, sync::Arc};
+use std::{ffi::OsStr, path::PathBuf, sync::Arc};
 
 use dptree::case;
 use jigsaw_common::{
@@ -22,7 +22,6 @@ use teloxide::{
     },
     Bot,
 };
-use tokio::sync::RwLockMappedWriteGuard;
 use uuid::Uuid;
 
 use crate::config::Config;
@@ -70,10 +69,6 @@ async fn filter_photo(message: Message, bot: Bot) -> Option<TelegramFile> {
     Some(telegram_file)
 }
 
-fn get_file_name(file: &teloxide::types::File) -> Option<String> {
-    Some(PathBuf::from(&file.path).file_name()?.to_str()?.to_string())
-}
-
 async fn photo_handler(
     bot: Bot,
     message: Message,
@@ -83,7 +78,11 @@ async fn photo_handler(
 ) -> Result<(), Report> {
     // Download a photo so generator can access it later
 
-    let file_name = get_file_name(&telegram_file).expect("File name should alaways be valid");
+    let file_name = PathBuf::from(&telegram_file.path)
+        .file_name()
+        .and_then(OsStr::to_str)
+        .map(ToString::to_string)
+        .expect("File name should alaways be valid");
 
     let mut file_path = config.request_storage_path.clone();
 

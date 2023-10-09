@@ -11,7 +11,6 @@ dotenvy = "0.15.7"
 dptree = "0.3.0"
 env_logger = "0.10.0"
 eyre = "0.6.8"
-figment = { version = "0.10.10", features = ["env", "toml"] }
 log = "0.4.20"
 serde = { version = "1.0.188", features = ["derive"] }
 teloxide = { version = "0.12.2", features = ["macros"] }

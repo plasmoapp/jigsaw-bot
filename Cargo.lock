@@ -1049,7 +1049,6 @@ dependencies = [
  "chrono",
  "dotenvy",
  "eyre",
- "figment",
  "futures",
  "futures-util",
  "hex",
@@ -1085,14 +1084,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "jigsaw-pubsub"
+name = "jigsaw-generator"
 version = "0.1.0"
 dependencies = [
  "async-trait",
  "dotenvy",
  "env_logger",
  "eyre",
- "figment",
  "futures",
  "image",
  "jigsaw-common",
@@ -1119,7 +1117,6 @@ dependencies = [
  "dptree",
  "env_logger",
  "eyre",
- "figment",
  "futures",
  "jigsaw-common",
  "log",

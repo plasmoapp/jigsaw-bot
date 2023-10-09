@@ -1,27 +1,18 @@
-use std::{collections::HashMap};
+use std::collections::HashMap;
 
-use axum::extract::ws::{WebSocket};
+use axum::extract::ws::WebSocket;
 use chrono::{Duration, NaiveDateTime, Utc};
-use futures::{StreamExt};
+use futures::StreamExt;
 use itertools::Itertools;
 
 use pipe_trait::Pipe;
-use redis::{AsyncCommands};
+use redis::AsyncCommands;
 
 use uuid::Uuid;
 
-use crate::{
-    model::user::{TelegramUser, User},
-};
+use crate::model::user::{TelegramUser, User};
 
-
-
-use super::{
-    error::SocketError,
-    handler::SocketHandler,
-    message::{WsRequest},
-    state::AppState,
-};
+use super::{error::SocketError, handler::SocketHandler, message::WsRequest, state::AppState};
 
 pub struct UnauthorizedSocketHandler {
     pub socket: WebSocket,
@@ -29,9 +20,12 @@ pub struct UnauthorizedSocketHandler {
     pub state: AppState,
 }
 
+// In the debug mode our server supports authorization protocol that doesn't require user to autorize with Telegram
+// This is only used for testing purposes. In release mode this protocol is not available
 const TELEGRAM_AUTH_PROTOCOL: &str = "jigsaw-telegram-auth";
 #[cfg(debug_assertions)]
 const NOT_SECURE_PROTOCOL: &str = "jigsaw-not-secure";
+
 #[cfg(debug_assertions)]
 pub const PROTOCOLS: [&str; 2] = [TELEGRAM_AUTH_PROTOCOL, NOT_SECURE_PROTOCOL];
 #[cfg(not(debug_assertions))]
@@ -60,14 +54,14 @@ impl UnauthorizedSocketHandler {
             protocol => Err(SocketError::UnsupportedProtocol(protocol.into()))?,
         };
 
-        // println!("Authorized as {}", user.1.name);
-
         let result = SocketHandler::new(self, user);
 
         Ok(result)
     }
 
+    // Based on https://core.telegram.org/bots/webapps#validating-data-received-via-the-mini-app
     async fn authorize_telegram(&mut self) -> Result<User, SocketError> {
+        // With this protocol we extect client to send TelegramAuth request with initData as the first packet
         let message: WsRequest = self
             .socket
             .recv()
@@ -80,20 +74,28 @@ impl UnauthorizedSocketHandler {
             _ => return Err(SocketError::InvalidRequest("TelegramAuth".into())),
         };
 
+        // initData is a urlencoded query stirng so we need to decode it
         let init_data = urlencoding::decode(&init_data)?;
 
+        // Transform initData into a HashMap we can use to get the values we need
         let query = init_data
             .split('&')
             .flat_map(|str| str.split_once('='))
             .collect::<HashMap<_, _>>();
 
+        // data_check_string is used to verify the initData using hash
         let data_check_string = init_data
             .split('&')
+            // This is not explicitly stated in the documentation, but we actually need to filter out the 'hash' field
+            // You can figure it out because it's impossible to include hash in the hashed message
             .filter(|str| !str.starts_with("hash"))
+            // Sort alphabetically like stated in the docs
             .sorted_by(|a, b| Ord::cmp(a, b))
             .intersperse("\n")
             .collect::<String>();
 
+        // telegram_web_secret is an equivalent of 'HMAC_SHA256(<bot_token>, "WebAppData")' from the documentation
+        // This variable is equivalent of HMAC_SHA256(data_check_string, secret_key)
         let tag = ring::hmac::sign(
             &self.state.telegram_web_secret,
             data_check_string.as_bytes(),
@@ -101,20 +103,23 @@ impl UnauthorizedSocketHandler {
 
         let hash = query.get("hash").ok_or(SocketError::InvalidCredentials)?;
 
+        // Encode the hash that we got and compare it to the hash from initData
         let verify = &hex::encode(tag.as_ref()) == hash;
 
         if !verify {
             Err(SocketError::InvalidCredentials)?;
         }
 
+        // Parse auth_data field from initData
         let auth_date = query
             .get("auth_date")
             .and_then(|date| date.parse::<i64>().ok())
             .and_then(|date| NaiveDateTime::from_timestamp_opt(date, 0))
-            .ok_or(SocketError::InvalidCredentials)?;
+            .expect("auth_date can't be invalid after the data was verified");
 
         let now = Utc::now().naive_utc();
 
+        // Return Err if initData is older than 15 minutes
         if now.signed_duration_since(auth_date) > Duration::minutes(15) {
             Err(SocketError::CredentialsExpired)?;
         }
@@ -124,42 +129,7 @@ impl UnauthorizedSocketHandler {
             .expect("User can't be None after the data was verified")
             .pipe(|user| serde_json::from_str(user))?;
 
+        // Now we can finaly return the User after making sure that all the data is valid
         Ok(user.into())
     }
 }
-
-// async fn handle_socket(
-//     mut socket: WebSocket,
-//     puzzle_uuid: Uuid,
-//     ws_state: Arc<WsState>,
-//     mut redis_connection: MultiplexedConnection,
-// ) {
-// let mut process_request_task = tokio::spawn(async move {
-//     process_request_task(&puzzle_uuid, ws_receiver, ch_sender, redis_connection)
-//         .await
-//         .unwrap()
-// });
-
-// tokio::select! {x
-//     _ = (&mut process_request_task) => {
-//         process_message_task.abort();
-//     },
-//     _ = (&mut process_message_task) => {
-//         process_request_task.abort();
-//     }
-// }
-// }
-
-// async fn process_request_task(
-//     puzzle_uuid: &Uuid,
-//     mut ws_receiver: SplitStream<WebSocket>,
-//     ch_sender: Sender<Arc<WsMessage>>,
-//     mut redis_connection: MultiplexedConnection,
-// ) -> Result<(), Report> {
-//     while let Some(Ok(message)) = ws_receiver.next().await {
-//         process_request(puzzle_uuid, message, &mut redis_connection)
-//             .await
-//             .unwrap();
-//     }
-//     Ok(())
-// }

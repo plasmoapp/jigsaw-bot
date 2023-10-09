@@ -10,19 +10,24 @@ use redis::{aio::MultiplexedConnection, AsyncCommands};
 
 use crate::jigsaw::{IndexedRawJigsawPuzzle, RawJigsawPuzzle};
 
-pub struct JigsawStorage {
-    image_storage: Box<dyn JigsawImageStorage + Sync + Send>,
-    state_storage: Box<dyn JigsawStateStorage + Sync + Send>,
+pub struct JigsawStorage<I, S>
+where
+    I: JigsawImageStorage + Sync + Send,
+    S: JigsawStateStorage + Sync + Send,
+{
+    image_storage: I,
+    state_storage: S,
 }
 
-impl JigsawStorage {
-    pub fn new(
-        image_storage: impl JigsawImageStorage + Sync + Send + 'static,
-        state_storage: impl JigsawStateStorage + Sync + Send + 'static,
-    ) -> Self {
+impl<I, S> JigsawStorage<I, S>
+where
+    I: JigsawImageStorage + Sync + Send,
+    S: JigsawStateStorage + Sync + Send,
+{
+    pub fn new(image_storage: I, state_storage: S) -> Self {
         Self {
-            image_storage: Box::new(image_storage),
-            state_storage: Box::new(state_storage),
+            image_storage,
+            state_storage,
         }
     }
 
