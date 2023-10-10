@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=4 format=2]
+[gd_resource type="Theme" load_steps=5 format=2]
 
 [ext_resource path="res://DefaultFont.tres" type="DynamicFont" id=1]
 
@@ -12,19 +12,29 @@ border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
 border_color = Color( 0.8, 0.8, 0.8, 0 )
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+corner_radius_top_left = 100
+corner_radius_top_right = 100
+corner_radius_bottom_right = 100
+corner_radius_bottom_left = 100
 
 [sub_resource type="StyleBoxFlat" id=1]
 content_margin_top = 6.0
 content_margin_bottom = 6.0
 bg_color = Color( 1, 0, 0, 1 )
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+corner_radius_top_left = 100
+corner_radius_top_right = 100
+corner_radius_bottom_right = 100
+corner_radius_bottom_left = 100
+
+[sub_resource type="StyleBoxFlat" id=3]
+content_margin_top = 4.0
+content_margin_bottom = 4.0
+corner_radius_top_left = 100
+corner_radius_top_right = 100
+corner_radius_bottom_right = 100
+corner_radius_bottom_left = 100
+expand_margin_left = 10.0
+expand_margin_right = 10.0
 
 [resource]
 default_font = ExtResource( 1 )
@@ -38,3 +48,4 @@ HScrollBar/styles/grabber = SubResource( 2 )
 HScrollBar/styles/grabber_highlight = SubResource( 2 )
 HScrollBar/styles/grabber_pressed = SubResource( 2 )
 HScrollBar/styles/scroll = SubResource( 1 )
+Label/styles/normal = SubResource( 3 )

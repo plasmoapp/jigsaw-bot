@@ -71,6 +71,9 @@ func load_telegram_colors():
 # colors here
 func update_theme():
 	theme.set_color("font_color", "Label", text_color)
+	theme.get_stylebox("normal", "Label").bg_color = secondary_bg_color
+	
 	theme.get_stylebox("scroll", "HScrollBar").bg_color = transparent
 	theme.get_stylebox("grabber", "HScrollBar").bg_color = hint_color	
+	
 	VisualServer.set_default_clear_color(bg_color)

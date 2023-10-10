@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://components/web_socket_client/WebSocketManager.tscn" type="PackedScene" id=2]
 [ext_resource path="res://components/game/Game.tscn" type="PackedScene" id=3]
@@ -6,13 +6,42 @@
 [ext_resource path="res://components/fading_label/FadingLabel.tscn" type="PackedScene" id=5]
 [ext_resource path="res://Theme.tres" type="Theme" id=6]
 
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node
+
+export(NodePath) onready var label = get_node(label) as FadingLabel
+
+export var enable: bool = false
+
+onready var timer := $Timer
+
+var test_text := [
+	\"Hello world!\",
+	\"KPidS joined the game\",
+	\"Apehum placed a tile\",
+	\"John left the game\",
+	\"SFSJLKFAJLGJSGK\"
+]
+
+func _ready():
+	
+	timer.connect(\"timeout\", self, \"_on_timeout\")
+	
+	if enable:
+		timer.start()
+
+func _on_timeout() -> void:
+	timer.wait_time = rand_range(0.5, 5)
+	label.update_text(test_text[rand_range(0, test_text.size() - 1)])
+"
+
 [node name="Main" type="Node"]
 
 [node name="GameManager" parent="." instance=ExtResource( 4 )]
 puzzle_uuid = "78f2f015-664b-48e7-9914-226ebefc02c4"
 web_socket_manager = NodePath("../WebSocketManager")
 game = NodePath("../Control/Game")
-status_label = NodePath("../Control/Header/FadingLabel")
+status_label = NodePath("../Control/Header/CenterContainer/FadingLabel")
 
 [node name="WebSocketManager" parent="." instance=ExtResource( 2 )]
 
@@ -28,20 +57,22 @@ margin_top = 48.0
 anchor_right = 1.0
 margin_bottom = 48.0
 
-[node name="FadingLabel" parent="Control/Header" instance=ExtResource( 5 )]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -68.0
-margin_top = -9.5
-margin_right = 68.0
-margin_bottom = 9.5
-text = "Pepegaetweewdsg"
+[node name="FadingLabelTest" type="Node" parent="Control/Header"]
+script = SubResource( 1 )
+label = NodePath("../CenterContainer/FadingLabel")
+
+[node name="Timer" type="Timer" parent="Control/Header/FadingLabelTest"]
+wait_time = 0.1
+
+[node name="CenterContainer" type="CenterContainer" parent="Control/Header"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="FadingLabel" parent="Control/Header/CenterContainer" instance=ExtResource( 5 )]
+margin_left = 694.0
+margin_top = 11.0
+margin_right = 745.0
+margin_bottom = 37.0
+text = "Pepega"
 align = 1
 valign = 1
-
-[node name="Label" type="Label" parent="Control/Header"]
-margin_right = 40.0
-margin_bottom = 18.0
-text = "Test Label"

@@ -14,14 +14,21 @@ func _ready():
 	
 	var dpi = OS.get_screen_dpi()
 	
+	print("DPI: %s" % dpi)
+	
 	var ui_scale
 	
-	if dpi < 240:
+	if OS.has_feature("JavaScript"):
+		ui_scale = JavaScript.eval("window.devicePixelRatio")
+	elif dpi < 240:
 		ui_scale = 1
 	elif dpi < 480:
 		ui_scale = 2
 	else:
 		ui_scale = 3
+		
+	if not ui_scale:
+		ui_scale = 1
 		
 	get_tree().set_screen_stretch(
 		SceneTree.STRETCH_MODE_DISABLED,
