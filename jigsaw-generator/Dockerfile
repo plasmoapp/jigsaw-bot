@@ -1,5 +1,6 @@
 # Rust as the base image
 FROM rustlang/rust:nightly as build
+ARG BUILD_MODE=release
 
 # Create a new empty shell project
 RUN USER=root cargo new --bin jigsaw-generator
@@ -12,24 +13,25 @@ COPY ./jigsaw-common ../jigsaw-common
 COPY ./jigsaw-generator/Cargo.toml ./Cargo.toml
 
 # Build only the dependencies to cache them
-RUN cargo build --release
+RUN if [ "$BUILD_MODE" = "release" ] ; then cargo build --release ; else cargo build ; fi
 RUN rm src/*.rs
 
 # Copy the source code
 COPY ./jigsaw-generator/src ./src
 
 # Build for release.
-RUN rm ./target/release/deps/jigsaw_generator*
-RUN cargo build --release
+RUN rm ./target/$BUILD_MODE/deps/jigsaw_generator*
+RUN if [ "$BUILD_MODE" = "release" ] ; then cargo build --release ; else cargo build ; fi
 
 # The final base image
 FROM debian:bullseye-slim
+ARG BUILD_MODE=release
 
 # Setup workdir
 WORKDIR /jigsaw-generator/
 
 # Copy from the previous build
-COPY --from=build /jigsaw-generator/target/release/jigsaw-generator .
+COPY --from=build /jigsaw-generator/target/$BUILD_MODE/jigsaw-generator .
 
 # Run the binary
 CMD ["./jigsaw-generator"]
