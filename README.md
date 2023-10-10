@@ -35,6 +35,7 @@ Try it out now: [@jigsawpuzzlebot](https://t.me/jigsawpuzzlebot)
 
 - Made with [Godot Engine](https://godotengine.org/)
 - Frontend of the Mini App
+- Uses version 3.5 of Godot because version 4.x has worse HTML support 
 
 ---
 
@@ -56,17 +57,30 @@ Try it out now: [@jigsawpuzzlebot](https://t.me/jigsawpuzzlebot)
 
 ## Documentation
 
-Most of the code has comments and is aproachable so if you're feeling courageous – clone the repo and jump straight into it
+Most of the code has comments so if you're feeling courageous – clone the repo and jump straight into it
 
-Here is also a list of specific features you might want to use in your project:
+Here is also a list of specific features you might want to use in your project
 
-### Mini App authorization on WebSockets (Rust, Axum)
+### Mini App authorization flow on WebSockets
 
-### Custom HTML export template for Godot
+- [/jigsaw-bot/blob/main/jigsaw-game/components/web_socket_client/web_socket_manager.gd](/jigsaw-bot/blob/main/jigsaw-game/components/web_socket_client/web_socket_manager.gd)
+- [/jigsaw-bot/blob/main/jigsaw-backend/src/websocket/unauthorized_handler.rs](/jigsaw-bot/blob/main/jigsaw-backend/src/websocket/unauthorized_handler.rs)
+- [Read Telegram Docs on Validating data](https://core.telegram.org/bots/webapps#validating-data-received-via-the-mini-app)
+
+### Custom HTML shell for Godot
+
+The shell affects how the loading screen looks. This custom shell will match Telegram theme 
+
+- [/jigsaw-game/custom_shell.html](/jigsaw-game/custom_shell.html)
+- [Read more on Godot Custom HTML Page](https://docs.godotengine.org/en/3.5/tutorials/platform/customizing_html5_shell.html)
 
 ### Sync Godot Theme with Telegram Theme 
 
-### Access start
+- [/jigsaw-game/global/theme_manager/theme_manager.gd](/jigsaw-game/global/theme_manager/theme_manager.gd)
+
+### Access Telegram startParam inside of Godot 
+
+- [/jigsaw-game/components/game_manager/game_manager.gd#L30](/jigsaw-game/components/game_manager/game_manager.gd)
 
 ## How to setup a developer enviroment
 
@@ -147,10 +161,10 @@ docker-compose ps -a
 # View logs
 docker-compose logs -f
 
-# Restart a specific container
-docker-compose restart backend
-docker-compose restart bot
-docker-compose restart generator
+# Build a specific container
+docker-compose up --build -d backend
+docker-compose up --build -d bot
+docker-compose up --build -d generator
 
 # Stop everything
 docker-compose stop
@@ -162,10 +176,19 @@ docker-compose stop
 
 After you've made changed to the [jigsaw-game](./jigsaw-game) project – you need to restart the `backend` container
 
-App runs on the port `3030` by default. You can change the port inside of the `docker-compose.yaml`
+App runs on the port `3030`. You can change it in `docker-compose.yaml`
  
 ## Planned features
 
-I've made some issues of features that I wanted to implement but didn't have time because of the contest deadline
+I've made a list of features that I wanted to implement but didn't have time because of the contest deadline
 
-Probably will work on them eventually but I also welcome contributions :)
+Probably will work on them eventually but I also welcome contributions 😊
+
+- [Chat UI #6](https://github.com/plasmoapp/jigsaw-bot/issues/6)
+- [Allow different tile dimensions #4](https://github.com/plasmoapp/jigsaw-bot/issues/4)
+- [Online player count #5](https://github.com/plasmoapp/jigsaw-bot/issues/5)
+- [Fix dragging ghost #8](https://github.com/plasmoapp/jigsaw-bot/issues/8)
+- [Sound effects #2](https://github.com/plasmoapp/jigsaw-bot/issues/2)
+- [Fix Z-index on tiles that don't snap to grid #7](https://github.com/plasmoapp/jigsaw-bot/issues/7)
+- [Check of user id collisions](https://github.com/plasmoapp/jigsaw-bot/issues/3) 
+- [Send a picture or a gif on /start #1](https://github.com/plasmoapp/jigsaw-bot/issues/1)
