@@ -8,6 +8,8 @@ Made with [Rust](https://www.rust-lang.org/) 🚀, [Godot](https://godotengine.o
 
 Try it out now: [@jigsawpuzzlebot](https://t.me/jigsawpuzzlebot)
 
+https://github.com/plasmoapp/jigsaw-bot/assets/27863947/33d762f9-6c69-4896-9314-4dc6cb318ad7
+
 ## Project overview
 
 ---
