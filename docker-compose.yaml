@@ -29,6 +29,7 @@ services:
     build:
       context: ./
       dockerfile: jigsaw-bot/Dockerfile
+    restart: always
     env_file: [ .env ]
     <<: *shared-environment
 
@@ -37,6 +38,7 @@ services:
     build:
       context: ./
       dockerfile: jigsaw-generator/Dockerfile
+    restart: always
     env_file: [ .env ]
     <<: *shared-environment
     volumes:
@@ -48,6 +50,7 @@ services:
     build:
       context: ./
       dockerfile: ./jigsaw-backend/Dockerfile
+    restart: always
     env_file: [ .env ]
     <<: *shared-environment
     volumes:
