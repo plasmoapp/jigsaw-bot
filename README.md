@@ -146,6 +146,8 @@ CONFIG.BOT_NAME=jigsawpuzzlebot
 CONFIG.WEB_APP_NAME=game
 # Bot Token 
 CONFIG.BOT_TOKEN=<bot_token>
+# Enable logs
+RUST_LOG=DEBUG
 ```
 
 ### 6. Start the containers 
@@ -168,6 +170,9 @@ docker-compose up --build -d generator
 
 # Stop everything
 docker-compose stop
+
+# If you want to build it in the release mode use this instead 
+docker-compose -f docker-compose-release.yaml up --build -d 
 ```
 
 ### Keep in mind
