@@ -7,4 +7,4 @@ script = ExtResource( 1 )
 __meta__ = {
 "_editor_description_": ""
 }
-test_url = "localhost:3000"
+test_url = "localhost:3030"

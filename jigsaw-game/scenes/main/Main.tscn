@@ -40,3 +40,8 @@ margin_bottom = 9.5
 text = "Pepegaetweewdsg"
 align = 1
 valign = 1
+
+[node name="Label" type="Label" parent="Control/Header"]
+margin_right = 40.0
+margin_bottom = 18.0
+text = "Test Label"
