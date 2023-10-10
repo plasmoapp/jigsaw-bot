@@ -16,8 +16,6 @@ func _ready():
 	
 	var dpi = OS.get_screen_dpi()
 	
-	print("DPI: %s" % dpi)
-	
 	var ui_scale
 	
 	if OS.has_feature("JavaScript"):

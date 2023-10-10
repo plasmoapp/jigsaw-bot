@@ -37,6 +37,8 @@ func set_score(users: Dictionary, scores: Dictionary):
 	
 	var dict_array = []
 	for user_id in scores:
+		if scores[user_id] == 0:
+			continue
 		var entry = {"user_id": user_id, "score": scores[user_id]}
 		dict_array.append(entry)
 		

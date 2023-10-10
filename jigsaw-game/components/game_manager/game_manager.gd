@@ -70,7 +70,14 @@ func _on_placed(message) -> void:
 	var user_id = str(message["user"])
 	var user_data = users[user_id]
 	
-	scores[user_id] += 1
+	print(scores[user_id])
+	
+	if scores[user_id]:
+		scores[user_id] += 1
+	else:
+		scores[user_id] = 1
+		
+	print(scores[user_id])
 	
 	status_label.update_text("%s placed a piece" % user_data["name"])
 	

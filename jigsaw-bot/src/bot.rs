@@ -125,13 +125,13 @@ async fn photo_handler(
 }
 
 async fn help_handler(bot: Bot, message: Message) -> Result<(), Report> {
-    bot.send_message(message.chat.id, "Send an image to create a puzzle.")
+    bot.send_message(message.chat.id, "Send an image to create a puzzle 🧩")
         .await?;
     Ok(())
 }
 
 async fn start_handler(bot: Bot, message: Message) -> Result<(), Report> {
-    bot.send_message(message.chat.id, "Welcome to the Jigsaw Puzzle bot!\n\nYou can turn any image into a jigsaw puzzle and then solve it together with friends without leaving Telegram.\n\nSend an image to create a puzzle.")
+    bot.send_message(message.chat.id, "Welcome to the Jigsaw Puzzle bot!\n\nTurn any image into a Jigsaw Puzzle and solve it together with friends without leaving Telegram\n\nSend an image to create a puzzle 🧩")
         .await?;
     Ok(())
 }

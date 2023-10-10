@@ -1,9 +1,11 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://components/fading_label/fading_label.gd" type="Script" id=1]
+[ext_resource path="res://fonts/MediumFont.tres" type="DynamicFont" id=2]
 
 [node name="FadingLabel" type="Label"]
 theme_type_variation = "FadingLabel"
+custom_fonts/font = ExtResource( 2 )
 text = "Test"
 script = ExtResource( 1 )
 

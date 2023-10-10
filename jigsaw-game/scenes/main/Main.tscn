@@ -39,13 +39,6 @@ func _on_timeout() -> void:
 
 [node name="Main" type="Node"]
 
-[node name="FadingLabelTest" type="Node" parent="."]
-script = SubResource( 1 )
-label = NodePath("../Control/Header/CenterContainer/FadingLabel")
-
-[node name="Timer" type="Timer" parent="FadingLabelTest"]
-wait_time = 0.1
-
 [node name="GameManager" parent="." instance=ExtResource( 4 )]
 puzzle_uuid = "78f2f015-664b-48e7-9914-226ebefc02c4"
 web_socket_manager = NodePath("../WebSocketManager")
@@ -54,6 +47,13 @@ status_label = NodePath("../Control/Header/CenterContainer/FadingLabel")
 popup_result = NodePath("../MarginContainer/CenterContainer/PopupResult")
 
 [node name="WebSocketManager" parent="." instance=ExtResource( 2 )]
+
+[node name="FadingLabelTest" type="Node" parent="."]
+script = SubResource( 1 )
+label = NodePath("../Control/Header/CenterContainer/FadingLabel")
+
+[node name="Timer" type="Timer" parent="FadingLabelTest"]
+wait_time = 0.1
 
 [node name="Control" type="Control" parent="."]
 anchor_right = 1.0
@@ -97,7 +97,9 @@ margin_bottom = 888.0
 mouse_filter = 2
 
 [node name="PopupResult" parent="MarginContainer/CenterContainer" instance=ExtResource( 1 )]
-margin_left = 563.0
-margin_top = 326.0
-margin_right = 812.0
-margin_bottom = 529.0
+visible = false
+margin_left = 688.0
+margin_top = 428.0
+margin_right = 688.0
+margin_bottom = 428.0
+rect_pivot_offset = Vector2( 0, 0 )
