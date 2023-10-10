@@ -2,7 +2,7 @@ version: "3.8"
 
 # Rust build mode: [debug, release]
 x-build-mode: &build-mode
-  debug
+  release
 
 volumes:
   data-request: {}
