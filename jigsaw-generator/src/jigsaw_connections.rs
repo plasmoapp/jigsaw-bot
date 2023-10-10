@@ -290,18 +290,14 @@ impl PieceConnections {
 impl PieceConnections {
     /// Generates a matrix of PieceConnection with specified width, height and seed.
     pub fn generate_connections_for_size(
-        width_px: u32,
-        height_px: u32,
-        tile_size_px: u32,
+        width: usize,
+        height: usize,
         seed: Option<u64>,
     ) -> Vec<Vec<PieceConnections>> {
         let mut rng = match seed {
             Some(seed) => StdRng::seed_from_u64(seed),
             None => StdRng::from_entropy(),
         };
-
-        let width = (width_px / tile_size_px) as usize;
-        let height = (height_px / tile_size_px) as usize;
 
         let mut matrix: Vec<Vec<PieceConnections>> =
             vec![vec![PieceConnections::empty(); width]; height];

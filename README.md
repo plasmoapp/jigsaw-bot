@@ -35,6 +35,7 @@ Try it out now: [@jigsawpuzzlebot](https://t.me/jigsawpuzzlebot)
 
 - Made with [Godot Engine](https://godotengine.org/)
 - Frontend of the Mini App
+- Uses version 3.5 of Godot because version 4.x has worse HTML support 
 
 ---
 
@@ -56,34 +57,138 @@ Try it out now: [@jigsawpuzzlebot](https://t.me/jigsawpuzzlebot)
 
 ## Documentation
 
-Most of the code has comments and is aproachable so if you're feeling courageous – clone the repo and jump straight into it
+Most of the code has comments so if you're feeling courageous – clone the repo and jump straight into it
 
-Here is also a list of specific features you might want to use in your project:
+Here is also a list of specific features you might want to use in your project
 
-### Mini App authorization on WebSockets (Rust, Axum)
+### Mini App authorization flow on WebSockets
 
-### Custom HTML export template for Godot
+- [/jigsaw-bot/blob/main/jigsaw-game/components/web_socket_client/web_socket_manager.gd](/jigsaw-bot/blob/main/jigsaw-game/components/web_socket_client/web_socket_manager.gd)
+- [/jigsaw-bot/blob/main/jigsaw-backend/src/websocket/unauthorized_handler.rs](/jigsaw-bot/blob/main/jigsaw-backend/src/websocket/unauthorized_handler.rs)
+- [Read Telegram Docs on Validating data](https://core.telegram.org/bots/webapps#validating-data-received-via-the-mini-app)
+
+### Custom HTML shell for Godot
+
+The shell affects how the loading screen looks. This custom shell will match Telegram theme 
+
+- [/jigsaw-game/custom_shell.html](/jigsaw-game/custom_shell.html)
+- [Read more on Godot Custom HTML Page](https://docs.godotengine.org/en/3.5/tutorials/platform/customizing_html5_shell.html)
 
 ### Sync Godot Theme with Telegram Theme 
 
-### 4
+- [/jigsaw-game/global/theme_manager/theme_manager.gd](/jigsaw-game/global/theme_manager/theme_manager.gd)
 
-## How to run dev enviroment or deploy 
+### Access Telegram startParam inside of Godot 
 
-### 1. Download Docker and optionally ngrok
+- [/jigsaw-game/components/game_manager/game_manager.gd#L30](/jigsaw-game/components/game_manager/game_manager.gd)
 
-### 2. Create a Telegram Bot and a Web App 
+## How to setup a developer enviroment
 
-### 3. Create .env file
+### 1. Download Docker
 
-### 4. Start the containers 
+Docker Compose will allow us to install dependencies and launch multiple processes with one simple command
 
-### Things to keep in mind
+Install Docker Engine: https://docs.docker.com/engine/install/#desktop
 
-[jigsaw-game]() project is built inside of the [jigsaw-backend]() Dockerfile. After you've made changed to the [jigsaw-game]() project – you need to restart the [jigsaw-backend]() container
+### 2. Setup Ngrok 
+
+You need a secure HTTP connection for a Telegram Web App. To test the app locally you can use ngrok 
+
+Download: https://ngrok.com/download
+
+Then use this command to open a tunnel
+
+```bash
+ngrok http 3030
+```
+
+Keep the URL that looks like this: `https://<something>-<something>.ngrok-free.app`
+
+### 3. Create a Telegram Bot and a Web App 
+
+Create a bot using [@BotFather](https://t.me/BotFather). Don't forget to copy and save the bot token as you will need it later
+
+```
+/newbot
+```
+
+Enable Inline Mode
+
+```
+/setinline
+```
+
+Create a Web App. Set URL to the one you got from ngrok. The app can have any name
+
+```
+/newapp
+```
+
+### 4. Clone the repo 
+
+```
+git clone https://github.com/plasmoapp/jigsaw-bot.git
+cd jigsaw-bot
+```
+
+### 5. Create .env file inside of the cloned repo 
+
+```bash
+touch .env
+```
+
+```env
+# URL of the Web App
+CONFIG.WEB_APP_URL=https://<something>-<something>.ngrok-free.app
+# Name of the bot. Like in @<bot_name> or t.me/<bot_name>
+CONFIG.BOT_NAME=jigsawpuzzlebot
+# Name of the Telegram Web App. Like in t.me/<bot_name>/<app_name>
+CONFIG.WEB_APP_NAME=game
+# Bot Token 
+CONFIG.BOT_TOKEN=<bot_token>
+```
+
+### 6. Start the containers 
+
+```bash
+docker-compose up --build -d
+```
+
+```bash
+# View status of the containers
+docker-compose ps -a
+
+# View logs
+docker-compose logs -f
+
+# Build a specific container
+docker-compose up --build -d backend
+docker-compose up --build -d bot
+docker-compose up --build -d generator
+
+# Stop everything
+docker-compose stop
+```
+
+### Keep in mind
+
+[jigsaw-game](./jigsaw-game) project is built inside of the [jigsaw-backend](./jigsaw-backend) Dockerfile
+
+After you've made changed to the [jigsaw-game](./jigsaw-game) project – you need to restart the `backend` container
+
+App runs on the port `3030`. You can change it in `docker-compose.yaml`
  
 ## Planned features
 
-I've made some issues of things that I wanted to implement but didn't have time because of the contest deadline
+I've made a list of features that I wanted to implement but didn't have time because of the contest deadline
 
-Probably will work on them eventually but I also welcome contributions :)
+Probably will work on them eventually but I also welcome contributions 😊
+
+- [Chat UI #6](https://github.com/plasmoapp/jigsaw-bot/issues/6)
+- [Allow different tile dimensions #4](https://github.com/plasmoapp/jigsaw-bot/issues/4)
+- [Online player count #5](https://github.com/plasmoapp/jigsaw-bot/issues/5)
+- [Fix dragging ghost #8](https://github.com/plasmoapp/jigsaw-bot/issues/8)
+- [Sound effects #2](https://github.com/plasmoapp/jigsaw-bot/issues/2)
+- [Fix Z-index on tiles that don't snap to grid #7](https://github.com/plasmoapp/jigsaw-bot/issues/7)
+- [Check of user id collisions](https://github.com/plasmoapp/jigsaw-bot/issues/3) 
+- [Send a picture or a gif on /start #1](https://github.com/plasmoapp/jigsaw-bot/issues/1)

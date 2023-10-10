@@ -6,6 +6,7 @@ pub mod generator;
 pub mod jigsaw;
 pub mod jigsaw_connections;
 pub mod storage;
+pub mod mask;
 
 use std::sync::Arc;
 
