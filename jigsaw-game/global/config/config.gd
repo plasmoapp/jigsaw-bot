@@ -3,6 +3,8 @@ extends Node
 # Used in the editor
 export var test_url: String
 
+export var bot_name: String = "jigsawpuzzlebot"
+
 onready var base_url = "http://%s" % test_url
 onready var base_ws_url = "ws://%s" % test_url
 

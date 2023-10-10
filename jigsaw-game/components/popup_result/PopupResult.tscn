@@ -1,0 +1,174 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://components/popup_result/popup_result.gd" type="Script" id=1]
+[ext_resource path="res://Theme.tres" type="Theme" id=2]
+[ext_resource path="res://components/popup_result/ScoreEntry.tscn" type="PackedScene" id=3]
+[ext_resource path="res://fonts/SubTitleFont.tres" type="DynamicFont" id=4]
+[ext_resource path="res://fonts/close.png" type="Texture" id=5]
+
+[sub_resource type="Animation" id=3]
+resource_name = "Hide"
+length = 10.0
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:rect_scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector2( 1, 1 ), Vector2( 0, 0 ) ]
+}
+tracks/1/type = "method"
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0.2 ),
+"transitions": PoolRealArray( 1 ),
+"values": [ {
+"args": [  ],
+"method": "hide"
+} ]
+}
+
+[sub_resource type="Animation" id=2]
+length = 0.001
+tracks/0/type = "bezier"
+tracks/0/path = NodePath(".:rect_scale:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"points": PoolRealArray( 1, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0 )
+}
+tracks/1/type = "bezier"
+tracks/1/path = NodePath(".:rect_scale:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"points": PoolRealArray( 1, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0 )
+}
+
+[sub_resource type="Animation" id=1]
+resource_name = "Show"
+length = 10.0
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:rect_scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.3 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector2( 0, 0 ), Vector2( 1, 1 ) ]
+}
+tracks/1/type = "method"
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"values": [ {
+"args": [  ],
+"method": "show"
+} ]
+}
+
+[node name="PopupResult" type="PanelContainer"]
+margin_right = 249.0
+margin_bottom = 203.0
+rect_pivot_offset = Vector2( 124.5, 101.5 )
+size_flags_horizontal = 5
+theme = ExtResource( 2 )
+script = ExtResource( 1 )
+score_entry_scene = ExtResource( 3 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/Hide = SubResource( 3 )
+anims/RESET = SubResource( 2 )
+anims/Show = SubResource( 1 )
+
+[node name="Control" type="Control" parent="."]
+margin_right = 249.0
+margin_bottom = 203.0
+mouse_filter = 2
+
+[node name="CloseButton" type="Button" parent="Control"]
+unique_name_in_owner = true
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -36.0
+margin_top = 6.0
+margin_right = -8.0
+margin_bottom = 40.0
+theme_type_variation = "IconButton"
+icon = ExtResource( 5 )
+expand_icon = true
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+margin_right = 249.0
+margin_bottom = 203.0
+mouse_filter = 2
+custom_constants/margin_right = 32
+custom_constants/margin_top = 32
+custom_constants/margin_left = 32
+custom_constants/margin_bottom = 32
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+margin_left = 32.0
+margin_top = 32.0
+margin_right = 217.0
+margin_bottom = 171.0
+rect_pivot_offset = Vector2( -132, 26 )
+mouse_filter = 2
+custom_constants/separation = 22
+
+[node name="VBoxContainer1" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+margin_right = 185.0
+margin_bottom = 53.0
+custom_constants/separation = 12
+
+[node name="Title" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer1"]
+margin_right = 185.0
+margin_bottom = 23.0
+theme_type_variation = "TitleLabel"
+text = "Jigsaw puzzle solved"
+
+[node name="SubTitle" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer1"]
+margin_top = 35.0
+margin_right = 185.0
+margin_bottom = 53.0
+theme = ExtResource( 2 )
+theme_type_variation = "SubTitleLabel"
+custom_fonts/font = ExtResource( 4 )
+text = "Most pieces placed"
+align = 1
+
+[node name="ScoreEntryContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+margin_top = 75.0
+margin_right = 185.0
+margin_bottom = 75.0
+custom_constants/separation = 8
+
+[node name="NewPuzzleButton" type="Button" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+margin_top = 97.0
+margin_right = 185.0
+margin_bottom = 139.0
+text = "New puzzle"

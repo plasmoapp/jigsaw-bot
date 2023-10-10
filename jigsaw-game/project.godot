@@ -24,6 +24,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://components/http_image/http_image.gd"
 }, {
+"base": "PanelContainer",
+"class": "PopupResult",
+"language": "GDScript",
+"path": "res://components/popup_result/popup_result.gd"
+}, {
 "base": "Control",
 "class": "PuzzleGridCell",
 "language": "GDScript",
@@ -39,6 +44,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://components/puzzle_piece/puzzle_piece.gd"
 }, {
+"base": "Control",
+"class": "ScoreEntry",
+"language": "GDScript",
+"path": "res://components/popup_result/score_entry.gd"
+}, {
 "base": "Object",
 "class": "Vector2Int",
 "language": "GDScript",
@@ -53,9 +63,11 @@ _global_script_class_icons={
 "FadingLabel": "",
 "Game": "",
 "HttpImage": "",
+"PopupResult": "",
 "PuzzleGridCell": "",
 "PuzzleMeta": "",
 "PuzzlePiece": "",
+"ScoreEntry": "",
 "Vector2Int": "",
 "WebSocketManager": ""
 }
@@ -85,6 +97,7 @@ window/stretch/shrink=2.0
 [gui]
 
 common/drop_mouse_on_gui_input_disabled=true
+theme/custom="res://Theme.tres"
 
 [input]
 

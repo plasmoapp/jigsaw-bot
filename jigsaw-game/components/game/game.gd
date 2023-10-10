@@ -55,6 +55,7 @@ func load_puzzle(new_meta: PuzzleMeta, initial_state: Dictionary):
 		var cell = initial_state[tile_uuid]
 		# If tile is not in place then we just put it in the tray
 		if not cell:
+			instance.add_to_group("not_placed")
 			hbox_container.add_child(instance)
 		# Otherwise we find cell that piece belongs to and place it there
 		else:
@@ -76,11 +77,15 @@ func place_tile(tile_uuid: String, index: Vector2Int):
 	
 	var pieces = get_tree().get_nodes_in_group("puzzle_piece")
 	
-	for piece in pieces:
+	for _piece in pieces:
+		var piece: PuzzlePiece = _piece
+		
 		# We only need to find pieces that match the uuid of the one that was
 		# placed
 		if piece.tile_uuid != tile_uuid:
 			continue
+		
+		piece.remove_from_group("not_placed")
 		
 		# If player is dragging tile that is placed we need to cancel drag
 		# and remove preview

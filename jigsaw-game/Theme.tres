@@ -1,34 +1,45 @@
-[gd_resource type="Theme" load_steps=5 format=2]
+[gd_resource type="Theme" load_steps=17 format=2]
 
-[ext_resource path="res://DefaultFont.tres" type="DynamicFont" id=1]
+[ext_resource path="res://fonts/TitleFont.tres" type="DynamicFont" id=1]
+[ext_resource path="res://fonts/DefaultFont.tres" type="DynamicFont" id=2]
+[ext_resource path="res://fonts/ButtonFont.tres" type="DynamicFont" id=3]
+[ext_resource path="res://fonts/SubTitleFont.tres" type="DynamicFont" id=4]
 
-[sub_resource type="StyleBoxFlat" id=2]
-content_margin_left = 0.0
-content_margin_right = 0.0
-content_margin_top = 0.0
-content_margin_bottom = 0.0
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color( 0.8, 0.8, 0.8, 0 )
-corner_radius_top_left = 100
-corner_radius_top_right = 100
-corner_radius_bottom_right = 100
-corner_radius_bottom_left = 100
+[sub_resource type="StyleBoxFlat" id=8]
+bg_color = Color( 0.521569, 0.521569, 0.521569, 0 )
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
-[sub_resource type="StyleBoxFlat" id=1]
-content_margin_top = 6.0
-content_margin_bottom = 6.0
-bg_color = Color( 1, 0, 0, 1 )
-corner_radius_top_left = 100
-corner_radius_top_right = 100
-corner_radius_bottom_right = 100
-corner_radius_bottom_left = 100
+[sub_resource type="StyleBoxFlat" id=6]
+bg_color = Color( 0.52549, 0.52549, 0.52549, 1 )
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id=5]
+content_margin_top = 12.0
+content_margin_bottom = 12.0
+bg_color = Color( 0, 0, 0, 1 )
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id=7]
+bg_color = Color( 0.337255, 0.337255, 0.337255, 1 )
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id=3]
-content_margin_top = 4.0
-content_margin_bottom = 4.0
+content_margin_left = 2.0
+content_margin_right = 2.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
 corner_radius_top_left = 100
 corner_radius_top_right = 100
 corner_radius_bottom_right = 100
@@ -36,16 +47,96 @@ corner_radius_bottom_left = 100
 expand_margin_left = 10.0
 expand_margin_right = 10.0
 
+[sub_resource type="StyleBoxFlat" id=13]
+content_margin_left = 2.0
+content_margin_right = 2.0
+content_margin_top = 2.0
+content_margin_bottom = 2.0
+bg_color = Color( 1, 0, 0, 1 )
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color( 0.309804, 0.309804, 0.309804, 1 )
+corner_radius_top_left = 100
+corner_radius_top_right = 100
+corner_radius_bottom_right = 100
+corner_radius_bottom_left = 100
+
+[sub_resource type="StyleBoxFlat" id=14]
+content_margin_top = 7.0
+content_margin_bottom = 7.0
+corner_radius_top_left = 100
+corner_radius_top_right = 100
+corner_radius_bottom_right = 100
+corner_radius_bottom_left = 100
+corner_detail = 20
+
+[sub_resource type="StyleBoxEmpty" id=11]
+content_margin_left = 8.0
+content_margin_right = 8.0
+content_margin_top = 8.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxEmpty" id=10]
+content_margin_left = 8.0
+content_margin_right = 8.0
+content_margin_top = 8.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxEmpty" id=9]
+content_margin_left = 8.0
+content_margin_right = 8.0
+content_margin_top = 8.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxEmpty" id=12]
+content_margin_left = 8.0
+content_margin_right = 8.0
+content_margin_top = 8.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id=4]
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
 [resource]
-default_font = ExtResource( 1 )
+default_font = ExtResource( 2 )
+Button/fonts/font = ExtResource( 3 )
+Button/styles/focus = SubResource( 8 )
+Button/styles/hover = SubResource( 6 )
+Button/styles/normal = SubResource( 5 )
+Button/styles/pressed = SubResource( 7 )
+FadingLabel/base_type = "Label"
+FadingLabel/styles/normal = SubResource( 3 )
 HScrollBar/icons/decrement = null
 HScrollBar/icons/decrement_highlight = null
 HScrollBar/icons/decrement_pressed = null
 HScrollBar/icons/increment = null
 HScrollBar/icons/increment_highlight = null
 HScrollBar/icons/increment_pressed = null
-HScrollBar/styles/grabber = SubResource( 2 )
-HScrollBar/styles/grabber_highlight = SubResource( 2 )
-HScrollBar/styles/grabber_pressed = SubResource( 2 )
-HScrollBar/styles/scroll = SubResource( 1 )
-Label/styles/normal = SubResource( 3 )
+HScrollBar/styles/grabber = SubResource( 13 )
+HScrollBar/styles/grabber_highlight = SubResource( 13 )
+HScrollBar/styles/grabber_pressed = SubResource( 13 )
+HScrollBar/styles/scroll = SubResource( 14 )
+IconButton/base_type = "Button"
+IconButton/colors/icon_color_disabled = Color( 0, 0, 0, 1 )
+IconButton/colors/icon_color_focus = Color( 0, 0, 0, 1 )
+IconButton/colors/icon_color_hover = Color( 0, 0, 0, 1 )
+IconButton/colors/icon_color_hover_pressed = Color( 0, 0, 0, 1 )
+IconButton/colors/icon_color_normal = Color( 0.988235, 0.00392157, 0.00392157, 1 )
+IconButton/colors/icon_color_pressed = Color( 0, 0, 0, 1 )
+IconButton/constants/hseparation = 0
+IconButton/styles/disabled = null
+IconButton/styles/focus = SubResource( 11 )
+IconButton/styles/hover = SubResource( 10 )
+IconButton/styles/normal = SubResource( 9 )
+IconButton/styles/pressed = SubResource( 12 )
+PanelContainer/styles/panel = SubResource( 4 )
+SubTitleLabel/base_type = "Label"
+SubTitleLabel/colors/font_color = Color( 0.643137, 0.643137, 0.643137, 1 )
+SubTitleLabel/fonts/font = ExtResource( 4 )
+TitleLabel/base_type = "Label"
+TitleLabel/fonts/font = ExtResource( 1 )

@@ -15,7 +15,7 @@ export var secondary_bg_color: Color
 
 var transparent := Color(0, 0, 0, 0)
 
-onready var theme: Theme = preload("res://Theme.tres")
+onready var theme: Theme = load("res://Theme.tres")
 
 var on_theme_change_callback
 
@@ -71,9 +71,33 @@ func load_telegram_colors():
 # colors here
 func update_theme():
 	theme.set_color("font_color", "Label", text_color)
-	theme.get_stylebox("normal", "Label").bg_color = secondary_bg_color
 	
-	theme.get_stylebox("scroll", "HScrollBar").bg_color = transparent
+	theme.set_color("font_color", "SubTitleLabel", hint_color)
+	
+	theme.get_stylebox("normal", "FadingLabel").set_bg_color(secondary_bg_color)
+	
+	theme.get_stylebox("panel", "PanelContainer").set_bg_color(secondary_bg_color)
+	
+	theme.get_stylebox("normal", "Button").set_bg_color(button_color)
+	theme.get_stylebox("focus", "Button").set_bg_color(transparent)
+	theme.get_stylebox("hover", "Button").set_bg_color(button_color.darkened(0.05))
+	theme.get_stylebox("pressed", "Button").set_bg_color(button_color.darkened(0.1))
+	
+	theme.set_color("font_color", "Button", button_text_color)
+	theme.set_color("font_color_focus", "Button", button_text_color)
+	theme.set_color("font_color_hover", "Button", button_text_color)
+	theme.set_color("font_color_hover_pressed", "Button", button_text_color)
+	theme.set_color("font_color_pressed", "Button", button_text_color)
+	
+	theme.set_color("icon_color_normal", "IconButton", hint_color)
+	theme.set_color("icon_color_focus", "IconButton", hint_color)
+	theme.set_color("icon_color_hover", "IconButton", hint_color.darkened(0.05))
+	theme.set_color("icon_color_hover_pressed", "IconButton", hint_color.darkened(0.1))
+	theme.set_color("icon_color_pressed", "IconButton", hint_color)
+
+	
+	theme.get_stylebox("scroll", "HScrollBar").bg_color = bg_color
 	theme.get_stylebox("grabber", "HScrollBar").bg_color = hint_color	
+	theme.get_stylebox("grabber", "HScrollBar").border_color = bg_color	
 	
 	VisualServer.set_default_clear_color(bg_color)
