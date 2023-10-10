@@ -16,11 +16,12 @@ export var enable: bool = false
 onready var timer := $Timer
 
 var test_text := [
-	\"Hello world!\",
-	\"KPidS joined the game\",
+	#\"Hello world!\",
+	#\"KPidS joined the game\",
 	\"Apehum placed a tile\",
-	\"John left the game\",
-	\"SFSJLKFAJLGJSGK\"
+	\"KPidS placed a tile\",
+	#\"John left the game\",
+	#\"SFSJLKFAJLGJSGK\"
 ]
 
 func _ready():
@@ -31,8 +32,8 @@ func _ready():
 		timer.start()
 
 func _on_timeout() -> void:
-	timer.wait_time = rand_range(0.5, 5)
-	label.update_text(test_text[rand_range(0, test_text.size() - 1)])
+	timer.wait_time = rand_range(0.5, 2)
+	label.update_text(test_text[randi() % test_text.size()])
 "
 
 [node name="Main" type="Node"]
