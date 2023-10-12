@@ -65,8 +65,8 @@ Here is also a list of specific features you might want to use in your project
 
 ### Mini App authorization flow on WebSockets
 
-- [/jigsaw-bot/blob/main/jigsaw-game/components/web_socket_client/web_socket_manager.gd](/jigsaw-bot/blob/main/jigsaw-game/components/web_socket_client/web_socket_manager.gd)
-- [/jigsaw-bot/blob/main/jigsaw-backend/src/websocket/unauthorized_handler.rs](/jigsaw-bot/blob/main/jigsaw-backend/src/websocket/unauthorized_handler.rs)
+- [/jigsaw-game/components/web_socket_client/web_socket_manager.gd](/jigsaw-game/components/web_socket_client/web_socket_manager.gd)
+- [/jigsaw-backend/src/websocket/unauthorized_handler.rs](/jigsaw-backend/src/websocket/unauthorized_handler.rs)
 - [Read Telegram Docs on Validating data](https://core.telegram.org/bots/webapps#validating-data-received-via-the-mini-app)
 
 ### Custom HTML shell for Godot
