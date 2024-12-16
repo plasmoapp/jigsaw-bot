@@ -34,7 +34,7 @@ RUN mkdir export
 RUN godot -v --export "HTML5" ./export/index.html
 
 # The final base image
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 ARG BUILD_MODE=release
 
 # Setup workdir

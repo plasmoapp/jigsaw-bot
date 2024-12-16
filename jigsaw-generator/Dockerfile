@@ -24,7 +24,7 @@ RUN rm ./target/$BUILD_MODE/deps/jigsaw_generator*
 RUN if [ "$BUILD_MODE" = "release" ] ; then cargo build --release ; else cargo build ; fi
 
 # The final base image
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 ARG BUILD_MODE=release
 
 # Setup workdir

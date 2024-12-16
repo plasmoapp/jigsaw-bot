@@ -1,0 +1,37 @@
+name: Build and push to ghcr.io
+on:
+  push:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        directory: [bot, generator, backend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to ghcr.io
+        env:
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+        run: echo $GHCR_TOKEN | docker login ghcr.io -u ${{ secrets.GHCR_TOKEN_OWNER }} --password-stdin
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}-${{ matrix.directory }}
+
+      - name: Build and push to ghcr.io
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: "{context}/jigsaw-${{ matrix.directory }}/Dockerfile"
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            GHCR_TOKEN=${{ secrets.GHCR_TOKEN }}
+            GIT_USER=${{ github.actor }}
