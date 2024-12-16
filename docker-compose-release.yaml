@@ -26,14 +26,14 @@ services:
 
   bot:
     depends_on: [ redis ]
-    image: plasmoapp/jigsaw-bot-bot:main
+    image: ghcr.io/plasmoapp/jigsaw-bot-bot:main
     restart: always
     env_file: [ .env ]
     <<: *shared-environment
 
   generator:
     depends_on: [ redis ]
-    image: plasmoapp/jigsaw-bot-generator:main
+    image: ghcr.io/plasmoapp/jigsaw-bot-generator:main
     restart: always
     env_file: [ .env ]
     <<: *shared-environment
@@ -43,7 +43,7 @@ services:
 
   backend:
     depends_on: [ redis ]
-    image: plasmoapp/jigsaw-bot-backend:main
+    image: ghcr.io/plasmoapp/jigsaw-bot-backend:main
     restart: always
     env_file: [ .env ]
     <<: *shared-environment
